@@ -10,6 +10,16 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+*.cover
+/coverage
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# IDEs
+/.idea
+/.vscode
+
+# Binaries and dists
+/fronius-exporter
+/dist
