@@ -1,4 +1,4 @@
-.PHONY: build fmt dist clean test
+.PHONY: build fmt dist clean test run
 SHELL := /usr/bin/env bash
 
 build: fmt
@@ -15,3 +15,6 @@ clean:
 
 test: fmt
 	@go test -coverprofile c.out ./...
+
+run:
+	@go run . -v
