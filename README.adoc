@@ -1,0 +1,76 @@
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:status:
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+= Fronius Exporter
+
+ifdef::status[]
+image:https://img.shields.io/github/workflow/status/ccremer/fronius-exporter/Build/master[Build,link=https://github.com/ccremer/fronius-exporter/actions?query=workflow%3ABuild]
+image:https://img.shields.io/codeclimate/maintainability/ccremer/fronius-exporter[Maintainability,link=https://codeclimate.com/github/ccremer/fronius-exporter]
+image:https://img.shields.io/codeclimate/coverage/ccremer/fronius-exporter[Tests,link=https://codeclimate.com/github/ccremer/fronius-exporter]
+image:https://img.shields.io/github/v/release/ccremer/fronius-exporter[Releases,link=https://github.com/ccremer/fronius-exporter/releases]
+image:https://img.shields.io/github/license/ccremer/fronius-exporter[License,link=https://github.com/ccremer/fronius-exporter/blob/master/LICENSE]
+image:https://img.shields.io/docker/pulls/ccremer/fronius-exporter[Docker image,link=https://hub.docker.com/r/ccremer/fronius-exporter]
+endif::[]
+
+== About
+
+Scrapes a Fronius Photovoltaic power installation and converts sensor data to Prometheus metrics.
+It has been tested with Fronius Symo 8.2-3-M (Software version 3.14.1-10).
+
+== Installing
+
+
+=== Traditional packages or binary
+
+. Download latest binary or package from the https://github.com/ccremer/fronius-exporter/releases[Releases page]
+. `dpkg -i fronius-exporter_linux_amd64.deb` (Debian/Ubuntu)
+. `rpm -i fronius-exporter_linux_amd64.rpm` (CentOS)
+. `chmod +x fronius-exporter && mv fronius-exporter /usr/local/bin/`
+
+=== Docker
+
+. `docker run -d --name fronius-exporter -p "8080:8080" ccremer/fronius-exporter`
+
+=== Helm Chart
+
+_Not yet existing_
+
+== Usage
+
+[source,console]
+----
+fronius-exporter --url http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi
+----
+
+Upon each call to `/metrics`, the exporter will do a GET request on the given URL, and translate the JSON
+response to Prometheus metrics format.
+
+== Configuration
+
+`fronius-exporter` can be configured with CLI flags. Call the binary with `--help` to get a list of options.
+
+TIP: All flags are also configurable with Environment variables. Replace the `.` char with `_` and
+     uppercase the names in order for them to be recognized, e.g. `--log.level debug` becomes
+     `LOG_LEVEL=debug`. CLI flags take precedence though.
+
+== Developing
+
+=== Requirements
+
+* Go
+* https://github.com/goreleaser/goreleaser[Goreleaser] (for packaging)
+
+=== Building
+
+. `make build`
+
+=== Tests
+
+. `make test`
