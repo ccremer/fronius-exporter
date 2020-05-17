@@ -24,6 +24,8 @@ endif::[]
 Scrapes a Fronius Photovoltaic power installation and converts sensor data to Prometheus metrics.
 It has been tested with Fronius Symo 8.2-3-M (Software version 3.14.1-10).
 
+image::examples/grafana.png[Grafana]
+
 == Installing
 
 
