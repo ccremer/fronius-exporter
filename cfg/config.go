@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func ParseConfig(version, commit, date string, fs *flag.FlagSet, args []string) *Configuration {
@@ -22,7 +23,9 @@ func ParseConfig(version, commit, date string, fs *flag.FlagSet, args []string) 
 	fs.BoolP("log.verbose", "v", config.Log.Verbose, "Shortcut for --log.level=debug")
 	fs.StringSlice("symo.header", []string{},
 		"List of \"key: value\" headers to append to the requests going to Fronius Symo")
-	fs.String("symo.url", config.Symo.Url, "Target URL of Fronius Symo device")
+	fs.StringP("symo.url", "u", config.Symo.Url, "Target URL of Fronius Symo device")
+	fs.Int64("symo.timeout", int64(config.Symo.Timeout.Seconds()),
+		"Timeout in seconds when collecting metrics from Fronius Symo. Should not be larger than the scrape interval")
 	if err := viper.BindPFlags(fs); err != nil {
 		log.WithError(err).Fatal("Could not bind flags")
 	}
@@ -37,6 +40,7 @@ func ParseConfig(version, commit, date string, fs *flag.FlagSet, args []string) 
 		log.WithError(err).Fatal("Could not read config")
 	}
 
+	config.Symo.Timeout *= time.Second
 	if config.Log.Verbose {
 		config.Log.Level = "debug"
 	}

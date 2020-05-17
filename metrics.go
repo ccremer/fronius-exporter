@@ -69,7 +69,8 @@ var (
 func collectMetricsFromTarget(client *fronius.SymoClient) {
 	start := time.Now()
 	log.WithFields(log.Fields{
-		"url": client.Options.URL,
+		"url":     client.Options.URL,
+		"timeout": client.Options.Timeout,
 	}).Debug("Requesting data.")
 	data, err := client.GetPowerFlowData()
 	if err != nil {
