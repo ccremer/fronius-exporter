@@ -38,9 +38,28 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		log.WithFields(log.Fields{
+			"uri":    r.RequestURI,
+			"client": r.RemoteAddr,
+		}).Debug("Accessed Root endpoint")
 		http.Redirect(w, r, "/metrics", http.StatusMovedPermanently)
 	})
+	http.HandleFunc("/liveness", func(w http.ResponseWriter, r *http.Request) {
+		log.WithFields(log.Fields{
+			"uri":    r.RequestURI,
+			"client": r.RemoteAddr,
+		}).Debug("Accessed Liveness endpoint")
+		w.WriteHeader(http.StatusNoContent)
+	})
 	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
+		log.WithFields(log.Fields{
+			"uri":    r.RequestURI,
+			"client": r.RemoteAddr,
+		}).Debug("Accessed Metrics endpoint")
 		collectMetricsFromTarget(symoClient)
 		promHandler.ServeHTTP(w, r)
 	})

@@ -9,18 +9,40 @@ on:
   pull_request:
     types: [opened, reopened]
 
+env:
+  GO_VERSION: "^1.14.3"
+
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: actions/setup-go@v2-beta
+    - uses: actions/setup-go@v2
       with:
-        go-version: '^1.14.2'
+        go-version: ${{ env.GO_VERSION }}
     - uses: actions/cache@v1
       with:
-        path: /home/runner/go/pkg/mod
-        key: go-mod-build
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - uses: goreleaser/goreleaser-action@v1
+      with:
+        args: release --snapshot --skip-sign
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
     - name: Test & Publish Code Coverage
       uses: paambaati/codeclimate-action@v2.6.0
       env:
@@ -30,6 +52,19 @@ jobs:
         prefix: ${{ github.event.repository.name }}
         coverageLocations:
           "${{github.workspace}}/c.out:gocov"
-    - uses: goreleaser/goreleaser-action@v1
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-go@v2
       with:
-        args: release --snapshot --skip-sign
+        go-version: ${{ env.GO_VERSION }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Verify if Code needs formatting
+      run: make fmt
