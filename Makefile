@@ -13,7 +13,7 @@ dist: fmt
 clean:
 	@rm -rf fronius-exporter c.out dist
 
-test: fmt
+test:
 	@go test -coverprofile c.out ./...
 
 run:

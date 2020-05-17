@@ -48,3 +48,17 @@ jobs:
         prefix: ${{ github.event.repository.name }}
         coverageLocations:
           "${{github.workspace}}/c.out:gocov"
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - uses: actions/cache@v1
+      with:
+        path: /home/runner/go/pkg/mod
+        key: go-mod-build
+    - name: Verify if Code needs formatting
+      run: make fmt
