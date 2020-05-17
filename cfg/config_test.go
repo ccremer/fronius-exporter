@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestConvertHeaders(t *testing.T) {
@@ -131,6 +132,13 @@ func TestParseConfig(t *testing.T) {
 			args: []string{"--symo.url", "myurl"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, "myurl", c.Symo.Url)
+			},
+		},
+		{
+			name: "GivenTimeoutFlag_WhenSpecified_ThenOverrideDefault",
+			args: []string{"--symo.timeout", "3"},
+			verify: func(c *Configuration) {
+				assert.Equal(t, 3*time.Second, c.Symo.Timeout)
 			},
 		},
 	}
