@@ -5,14 +5,17 @@ import (
 	"fronius-exporter/pkg/fronius"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	flag "github.com/spf13/pflag"
 	"net/http"
+	"os"
+	"time"
 )
 
 var (
 	version     = "unknown"
 	commit      = "dirty"
-	date        = "today"
-	config      = cfg.ParseConfig(version, commit, date)
+	date        = time.Now().String()
+	config      = cfg.ParseConfig(version, commit, date, flag.NewFlagSet("main", flag.ExitOnError), os.Args[1:])
 	promHandler = promhttp.Handler()
 )
 

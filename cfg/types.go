@@ -18,7 +18,7 @@ type (
 	SymoConfig struct {
 		Url     string
 		Timeout time.Duration
-		Headers []string
+		Headers []string `mapstructure:"header"`
 	}
 )
 

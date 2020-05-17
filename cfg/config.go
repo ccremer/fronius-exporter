@@ -10,24 +10,26 @@ import (
 	"strings"
 )
 
-func ParseConfig(version, commit, date string) *Configuration {
+func ParseConfig(version, commit, date string, fs *flag.FlagSet, args []string) *Configuration {
 	config := NewDefaultConfig()
 
-	flag.Usage = func() {
+	fs.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s (version %s, %s, %s):\n", os.Args[0], version, commit, date)
-		flag.PrintDefaults()
+		fs.PrintDefaults()
 	}
-	flag.String("bindAddr", config.BindAddr, "IP Address to bind to listen for Prometheus scrapes")
-	flag.String("log.level", config.Log.Level, "Logging level")
-	flag.BoolP("log.verbose", "v", config.Log.Verbose, "Shortcut for --log.level=debug")
-	flag.StringSlice("symo.headers", []string{},
+	fs.String("bindAddr", config.BindAddr, "IP Address to bind to listen for Prometheus scrapes")
+	fs.String("log.level", config.Log.Level, "Logging level")
+	fs.BoolP("log.verbose", "v", config.Log.Verbose, "Shortcut for --log.level=debug")
+	fs.StringSlice("symo.header", []string{},
 		"List of \"key: value\" headers to append to the requests going to Fronius Symo")
-	flag.String("symo.url", config.Symo.Url, "Target URL of Fronius Symo device")
-	if err := viper.BindPFlags(flag.CommandLine); err != nil {
-		log.WithError(err).Fatal(err)
+	fs.String("symo.url", config.Symo.Url, "Target URL of Fronius Symo device")
+	if err := viper.BindPFlags(fs); err != nil {
+		log.WithError(err).Fatal("Could not bind flags")
 	}
 
-	flag.Parse()
+	if err := fs.Parse(args); err != nil {
+		log.WithError(err).Fatal("Could not parse flags")
+	}
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 	viper.AutomaticEnv()
 
@@ -41,11 +43,12 @@ func ParseConfig(version, commit, date string) *Configuration {
 	level, err := log.ParseLevel(config.Log.Level)
 	if err != nil {
 		log.WithError(err).Warn("Could not parse log level, fallback to info level")
+		config.Log.Level = "info"
 		log.SetLevel(log.InfoLevel)
 	} else {
 		log.SetLevel(level)
 	}
-	log.WithField("config", *config).Debug("Parsed config.")
+	log.WithField("config", *config).Debug("Parsed config")
 	return config
 }
 
@@ -64,7 +67,7 @@ func ConvertHeaders(headers []string, header *http.Header) {
 		log.WithFields(log.Fields{
 			"key":   key,
 			"value": value,
-		}).Debug("Using header.")
+		}).Debug("Using header")
 		header.Set(key, value)
 	}
 }
