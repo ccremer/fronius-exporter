@@ -46,6 +46,7 @@ changelog:
     - '^Test:'
     - '^Refactor:'
     - '^Merge pull request'
+    - '^GH:'
 
 release:
   github:
