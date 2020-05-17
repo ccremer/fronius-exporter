@@ -22,8 +22,10 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
     - uses: actions/cache@v1
       with:
-        path: /home/runner/go/pkg/mod
-        key: go-mod-build
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
     - uses: goreleaser/goreleaser-action@v1
       with:
         args: release --snapshot --skip-sign
@@ -37,8 +39,10 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
     - uses: actions/cache@v1
       with:
-        path: /home/runner/go/pkg/mod
-        key: go-mod-build
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
     - name: Test & Publish Code Coverage
       uses: paambaati/codeclimate-action@v2.6.0
       env:
@@ -58,7 +62,9 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
     - uses: actions/cache@v1
       with:
-        path: /home/runner/go/pkg/mod
-        key: go-mod-build
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
     - name: Verify if Code needs formatting
       run: make fmt
