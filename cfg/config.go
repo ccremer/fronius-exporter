@@ -58,11 +58,11 @@ func ParseConfig(version, commit, date string, fs *flag.FlagSet, args []string) 
 
 func ConvertHeaders(headers []string, header *http.Header) {
 	for _, hd := range headers {
-		arr := strings.SplitN(hd, ":", 2)
+		arr := strings.SplitN(hd, "=", 2)
 		if len(arr) < 2 {
 			log.WithFields(log.Fields{
 				"arg":   hd,
-				"error": "cannot split: missing colon",
+				"error": "cannot split: missing equal sign",
 			}).Warn("Could not parse header, ignoring")
 			continue
 		}

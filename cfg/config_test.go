@@ -42,7 +42,7 @@ func TestConvertHeaders(t *testing.T) {
 		{
 			name: "WhenValidEntry_ThenParse",
 			args: args{
-				headers: []string{"Authentication: Bearer <token>"},
+				headers: []string{"Authentication= Bearer <token>"},
 				header:  &http.Header{},
 			},
 			verify: func(header *http.Header) {
@@ -52,7 +52,7 @@ func TestConvertHeaders(t *testing.T) {
 		{
 			name: "GivenValidEntry_WhenSpacesAroundValues_ThenTrim",
 			args: args{
-				headers: []string{"  Authentication:   Bearer <token>  "},
+				headers: []string{"  Authentication =   Bearer <token>  "},
 				header:  &http.Header{},
 			},
 			verify: func(header *http.Header) {
@@ -123,20 +123,20 @@ func TestParseConfig(t *testing.T) {
 		},
 		{
 			name: "GivenHeaderFlags_WhenMultipleHeadersSpecified_ThenFillArray",
-			args: []string{"--symo.header", "key1:value1", "--symo.header", "KEY2: value2"},
+			args: []string{"--symo.header", "key1=value1", "--symo.header", "KEY2= value2"},
 			verify: func(c *Configuration) {
-				assert.Contains(t, c.Symo.Headers, "key1:value1")
-				assert.Contains(t, c.Symo.Headers, "KEY2: value2")
+				assert.Contains(t, c.Symo.Headers, "key1=value1")
+				assert.Contains(t, c.Symo.Headers, "KEY2= value2")
 			},
 		},
 		{
 			name: "GivenHeaderEnvVar_WhenMultipleHeadersSpecified_ThenFillArray",
 			envs: map[string]string{
-				"SYMO_HEADER": "key1:value1, KEY2: value2",
+				"SYMO_HEADER": "key1=value1, KEY2= value2",
 			},
 			verify: func(c *Configuration) {
-				assert.Contains(t, c.Symo.Headers, "key1:value1")
-				assert.Contains(t, c.Symo.Headers, " KEY2: value2")
+				assert.Contains(t, c.Symo.Headers, "key1=value1")
+				assert.Contains(t, c.Symo.Headers, " KEY2= value2")
 			},
 		},
 		{
