@@ -143,7 +143,7 @@ func TestParseConfig(t *testing.T) {
 			name: "GivenUrlFlag_ThenOverrideDefault",
 			args: []string{"--symo.url", "myurl"},
 			verify: func(c *Configuration) {
-				assert.Equal(t, "myurl", c.Symo.Url)
+				assert.Equal(t, "myurl", c.Symo.URL)
 			},
 		},
 		{

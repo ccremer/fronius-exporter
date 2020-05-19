@@ -16,7 +16,7 @@ type (
 	}
 	// SymoConfig configures the Fronius Symo device
 	SymoConfig struct {
-		Url     string
+		URL     string
 		Timeout time.Duration
 		Headers []string `mapstructure:"header"`
 	}
@@ -29,7 +29,7 @@ func NewDefaultConfig() *Configuration {
 			Level: "info",
 		},
 		Symo: SymoConfig{
-			Url:     "http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi",
+			URL:     "http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi",
 			Timeout: 5 * time.Second,
 			Headers: []string{},
 		},

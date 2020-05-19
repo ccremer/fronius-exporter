@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+// ParseConfig overrides internal config defaults with up CLI flags, environment variables and ensures basic validation.
 func ParseConfig(version, commit, date string, fs *flag.FlagSet, args []string) *Configuration {
 	config := NewDefaultConfig()
 
@@ -23,7 +24,7 @@ func ParseConfig(version, commit, date string, fs *flag.FlagSet, args []string) 
 	fs.BoolP("log.verbose", "v", config.Log.Verbose, "Shortcut for --log.level=debug")
 	fs.StringSlice("symo.header", []string{},
 		"List of \"key: value\" headers to append to the requests going to Fronius Symo")
-	fs.StringP("symo.url", "u", config.Symo.Url, "Target URL of Fronius Symo device")
+	fs.StringP("symo.url", "u", config.Symo.URL, "Target URL of Fronius Symo device")
 	fs.Int64("symo.timeout", int64(config.Symo.Timeout.Seconds()),
 		"Timeout in seconds when collecting metrics from Fronius Symo. Should not be larger than the scrape interval")
 	if err := viper.BindPFlags(fs); err != nil {
@@ -56,6 +57,8 @@ func ParseConfig(version, commit, date string, fs *flag.FlagSet, args []string) 
 	return config
 }
 
+// ConvertHeaders takes a list of `key=value` headers and adds those trimmed to the specified header struct. It ignores
+// any malformed entries.
 func ConvertHeaders(headers []string, header *http.Header) {
 	for _, hd := range headers {
 		arr := strings.SplitN(hd, "=", 2)

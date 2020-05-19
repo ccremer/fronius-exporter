@@ -13,6 +13,7 @@ type (
 			Data SymoData
 		}
 	}
+	// SymoData holds the parsed data from the Symo API.
 	SymoData struct {
 		Inverters map[string]Inverter
 		Site      struct {
@@ -44,6 +45,7 @@ type (
 			EnergyTotal float64 `json:"E_Total"`
 		}
 	}
+	// Inverter represents a power inverter installed at the Fronius Symo site.
 	Inverter struct {
 		DT          float64 `json:"DT"`
 		Power       float64 `json:"P"`
@@ -51,10 +53,12 @@ type (
 		EnergyYear  float64 `json:"E_Year"`
 		EnergyTotal float64 `json:"E_Total"`
 	}
+	// SymoClient is a wrapper for making API requests against a Fronius Symo device.
 	SymoClient struct {
 		request *http.Request
 		Options ClientOptions
 	}
+	// ClientOptions holds some parameters for the SymoClient.
 	ClientOptions struct {
 		URL     string
 		Headers http.Header
@@ -62,6 +66,7 @@ type (
 	}
 )
 
+// NewSymoClient constructs a SymoClient ready to use for collecting metrics.
 func NewSymoClient(options ClientOptions) (*SymoClient, error) {
 	u, err := url.Parse(options.URL)
 	if err != nil {
@@ -76,6 +81,7 @@ func NewSymoClient(options ClientOptions) (*SymoClient, error) {
 	}, nil
 }
 
+// GetPowerFlowData returns the parsed data from the Symo device.
 func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
 	client := http.DefaultClient
 	client.Timeout = c.Options.Timeout
