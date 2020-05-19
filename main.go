@@ -29,7 +29,7 @@ func main() {
 	headers := http.Header{}
 	cfg.ConvertHeaders(config.Symo.Headers, &headers)
 	symoClient, err := fronius.NewSymoClient(fronius.ClientOptions{
-		URL:     config.Symo.Url,
+		URL:     config.Symo.URL,
 		Headers: headers,
 		Timeout: config.Symo.Timeout,
 	})
