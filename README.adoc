@@ -6,6 +6,7 @@ ifdef::env-github[]
 :important-caption: :heavy_exclamation_mark:
 :caution-caption: :fire:
 :warning-caption: :warning:
+:ext-relative: {outfilesuffix}
 endif::[]
 
 = Fronius Exporter
@@ -61,6 +62,10 @@ response to Prometheus metrics format.
 TIP: All flags are also configurable with Environment variables. Replace the `.` char with `_` and
      uppercase the names in order for them to be recognized, e.g. `--log.level debug` becomes
      `LOG_LEVEL=debug`. CLI flags take precedence though.
+
+== As a client API
+
+See link:examples/client.go[Example]
 
 == Developing
 
