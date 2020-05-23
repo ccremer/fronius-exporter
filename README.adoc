@@ -43,7 +43,10 @@ image::examples/grafana.png[Grafana]
 
 === Helm Chart
 
-_Not yet existing_
+With https://ccremer.github.io/charts/fronius-exporter[fronius-exporter]
+
+. `helm repo add ccremer https://ccremer.github.io/charts`
+. `helm install fronius ccremer/fronius-exporter`
 
 == Usage
 
