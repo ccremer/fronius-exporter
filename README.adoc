@@ -62,9 +62,12 @@ response to Prometheus metrics format.
 
 `fronius-exporter` can be configured with CLI flags. Call the binary with `--help` to get a list of options.
 
-TIP: All flags are also configurable with Environment variables. Replace the `.` char with `_` and
-     uppercase the names in order for them to be recognized, e.g. `--log.level debug` becomes
-     `LOG_LEVEL=debug`. CLI flags take precedence though.
+[TIP]
+====
+All flags are also configurable with Environment variables.
+Replace the `.` char with `_` and uppercase the names in order for them to be recognized, e.g. `--log.level debug` becomes `LOG_LEVEL=debug`.
+CLI flags take precedence though.
+====
 
 == As a client API
 
@@ -75,12 +78,8 @@ See link:examples/client.go[Example]
 === Requirements
 
 * Go
-* https://github.com/goreleaser/goreleaser[Goreleaser] (for packaging)
+* Docker
 
 === Building
 
-. `make build`
-
-=== Tests
-
-. `make test`
+Run `make help` to see available goals
