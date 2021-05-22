@@ -5,20 +5,20 @@ import "time"
 type (
 	// Configuration holds a strongly-typed tree of the configuration
 	Configuration struct {
-		Log      LogConfig
-		Symo     SymoConfig
-		BindAddr string
+		Log      LogConfig  `koanf:"log"`
+		Symo     SymoConfig `koanf:"symo"`
+		BindAddr string     `koanf:"bind-addr"`
 	}
 	// LogConfig configures the logging options
 	LogConfig struct {
-		Level   string
-		Verbose bool
+		Level   string `koanf:"level"`
+		Verbose bool   `koanf:"verbose"`
 	}
 	// SymoConfig configures the Fronius Symo device
 	SymoConfig struct {
-		URL     string
-		Timeout time.Duration
-		Headers []string `mapstructure:"header"`
+		URL     string        `koanf:"url"`
+		Timeout time.Duration `koanf:"timeout"`
+		Headers []string      `koanf:"header"`
 	}
 )
 

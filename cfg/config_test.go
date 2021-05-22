@@ -105,7 +105,7 @@ func TestParseConfig(t *testing.T) {
 			},
 		},
 		"GivenFlags_WhenBindAddrSpecified_ThenOverridePort": {
-			args: []string{"--bindAddr", ":9090"},
+			args: []string{"--bind-addr", ":9090"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, ":9090", c.BindAddr)
 			},
@@ -119,11 +119,20 @@ func TestParseConfig(t *testing.T) {
 		},
 		"GivenHeaderEnvVar_WhenMultipleHeadersSpecified_ThenFillArray": {
 			envs: map[string]string{
-				"SYMO_HEADER": "key1=value1, KEY2= value2",
+				"SYMO__HEADER": "key1=value1, KEY2= value2",
 			},
 			verify: func(c *Configuration) {
 				assert.Contains(t, c.Symo.Headers, "key1=value1")
-				assert.Contains(t, c.Symo.Headers, " KEY2= value2")
+				assert.Contains(t, c.Symo.Headers, "KEY2= value2")
+			},
+		},
+		"GivenHeaderEnvVarAndFlag_WhenMultipleHeadersSpecified_ThenTakePrecedenceFromCLI": {
+			envs: map[string]string{
+				"SYMO__HEADER": "key1=value1, KEY2= value2",
+			},
+			args: []string{"--symo.header", "key3=value3"},
+			verify: func(c *Configuration) {
+				assert.Equal(t, c.Symo.Headers, []string{"key3=value3"})
 			},
 		},
 		"GivenUrlFlag_ThenOverrideDefault": {
@@ -158,5 +167,48 @@ func setEnv(m map[string]string) {
 func unsetEnv(m map[string]string) {
 	for key, _ := range m {
 		os.Unsetenv(key)
+	}
+}
+
+func Test_parseHeaderString(t *testing.T) {
+	tests := map[string]struct {
+		given    string
+		expected []string
+	}{
+		"GivenSingleHeader_WhenParsing_LeaveUnchanged": {
+			given:    "key=value",
+			expected: []string{"key=value"},
+		},
+		"GivenTwoHeaders_WhenParsing_SplitInTwo": {
+			given:    "key1=value1,key2=value2",
+			expected: []string{"key1=value1", "key2=value2"},
+		},
+		"GivenThreeHeaders_WhenParsing_SplitInThree": {
+			given:    "key1=value1,key2=value2,key3=value3",
+			expected: []string{"key1=value1", "key2=value2", "key3=value3"},
+		},
+		"GivenMalformedHeaders_WhenParsing_RegardAsPartOfPreviousHeader": {
+			given:    "key1=value1,key2value2",
+			expected: []string{"key1=value1", "key2value2"},
+		},
+		"GivenHeadersWithSpace_WhenParsing_TrimSpaceAfterComma": {
+			given:    "key1=value1 , key2=value2",
+			expected: []string{"key1=value1", "key2=value2"},
+		},
+		"GivenHeadersWithTrailingComma_WhenParsing_IgnoreEmptyString": {
+			given:    "key1=value1 ,",
+			expected: []string{"key1=value1"},
+		},
+		"GivenHeadersWithSpaces_WhenParsing_Include": {
+			given:    "key1=value with space,",
+			expected: []string{"key1=value with space"},
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			var result []string
+			result = splitHeaderStrings(tt.given, result)
+			assert.Equal(t, tt.expected, result)
+		})
 	}
 }
