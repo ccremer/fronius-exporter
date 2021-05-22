@@ -15,13 +15,11 @@ func TestConvertHeaders(t *testing.T) {
 		headers []string
 		header  *http.Header
 	}
-	tests := []struct {
-		name   string
+	tests := map[string]struct {
 		args   args
 		verify func(header *http.Header)
 	}{
-		{
-			name: "WhenEmptyArray_ThenDoNothing",
+		"WhenEmptyArray_ThenDoNothing": {
 			args: args{
 				headers: []string{},
 				header:  &http.Header{},
@@ -30,8 +28,7 @@ func TestConvertHeaders(t *testing.T) {
 				assert.Empty(t, header)
 			},
 		},
-		{
-			name: "WhenInvalidEntry_ThenIgnore",
+		"WhenInvalidEntry_ThenIgnore": {
 			args: args{
 				headers: []string{"invalid"},
 				header:  &http.Header{},
@@ -40,8 +37,7 @@ func TestConvertHeaders(t *testing.T) {
 				assert.Empty(t, header)
 			},
 		},
-		{
-			name: "WhenValidEntry_ThenParse",
+		"WhenValidEntry_ThenParse": {
 			args: args{
 				headers: []string{"Authentication= Bearer <token>"},
 				header:  &http.Header{},
@@ -50,8 +46,7 @@ func TestConvertHeaders(t *testing.T) {
 				assert.Equal(t, "Bearer <token>", header.Get("Authentication"))
 			},
 		},
-		{
-			name: "GivenValidEntry_WhenSpacesAroundValues_ThenTrim",
+		"GivenValidEntry_WhenSpacesAroundValues_ThenTrim": {
 			args: args{
 				headers: []string{"  Authentication =   Bearer <token>  "},
 				header:  &http.Header{},
@@ -61,8 +56,8 @@ func TestConvertHeaders(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			ConvertHeaders(tt.args.headers, tt.args.header)
 			tt.verify(tt.args.header)
 		})
@@ -70,68 +65,59 @@ func TestConvertHeaders(t *testing.T) {
 }
 
 func TestParseConfig(t *testing.T) {
-	tests := []struct {
-		name   string
+	tests := map[string]struct {
 		args   []string
 		envs   map[string]string
 		want   *Configuration
 		fs     flag.FlagSet
 		verify func(c *Configuration)
 	}{
-		{
-			name: "GivenNoFlags_ThenReturnDefaultConfig",
+		"GivenNoFlags_ThenReturnDefaultConfig": {
 			args: []string{},
 			verify: func(c *Configuration) {
 				assert.Equal(t, "info", c.Log.Level)
 			},
 		},
-		{
-			name: "GivenLogFlags_WhenVerboseEnabled_ThenSetLoggingLevelToDebug",
+		"GivenLogFlags_WhenVerboseEnabled_ThenSetLoggingLevelToDebug": {
 			args: []string{"-v"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, "debug", c.Log.Level)
 				assert.Equal(t, true, c.Log.Verbose)
 			},
 		},
-		{
-			name: "GivenLogFlags_WhenLogLevelSpecified_ThenOverrideLogLevel",
+		"GivenLogFlags_WhenLogLevelSpecified_ThenOverrideLogLevel": {
 			args: []string{"--log.level=warn"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, "warn", c.Log.Level)
 			},
 		},
-		{
-			name: "GivenLogFlags_WhenInvalidLogLevelSpecified_ThenSetLoggingLevelToInfo",
+		"GivenLogFlags_WhenInvalidLogLevelSpecified_ThenSetLoggingLevelToInfo": {
 			args: []string{"--log.level=invalid"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, "info", c.Log.Level)
 			},
 		},
-		{
-			name: "GivenLogLevel_WhenVerboseEnabled_ThenSetLoggingLevelToDebug",
+		"GivenLogLevel_WhenVerboseEnabled_ThenSetLoggingLevelToDebug": {
 			args: []string{"--log.level=fatal", "-v"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, "debug", c.Log.Level)
 				assert.Equal(t, true, c.Log.Verbose)
 			},
 		},
-		{
-			name: "GivenFlags_WhenBindAddrSpecified_ThenOverridePort",
+		"GivenFlags_WhenBindAddrSpecified_ThenOverridePort": {
 			args: []string{"--bindAddr", ":9090"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, ":9090", c.BindAddr)
 			},
 		},
-		{
-			name: "GivenHeaderFlags_WhenMultipleHeadersSpecified_ThenFillArray",
+		"GivenHeaderFlags_WhenMultipleHeadersSpecified_ThenFillArray": {
 			args: []string{"--symo.header", "key1=value1", "--symo.header", "KEY2= value2"},
 			verify: func(c *Configuration) {
 				assert.Contains(t, c.Symo.Headers, "key1=value1")
 				assert.Contains(t, c.Symo.Headers, "KEY2= value2")
 			},
 		},
-		{
-			name: "GivenHeaderEnvVar_WhenMultipleHeadersSpecified_ThenFillArray",
+		"GivenHeaderEnvVar_WhenMultipleHeadersSpecified_ThenFillArray": {
 			envs: map[string]string{
 				"SYMO_HEADER": "key1=value1, KEY2= value2",
 			},
@@ -140,23 +126,21 @@ func TestParseConfig(t *testing.T) {
 				assert.Contains(t, c.Symo.Headers, " KEY2= value2")
 			},
 		},
-		{
-			name: "GivenUrlFlag_ThenOverrideDefault",
+		"GivenUrlFlag_ThenOverrideDefault": {
 			args: []string{"--symo.url", "myurl"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, "myurl", c.Symo.URL)
 			},
 		},
-		{
-			name: "GivenTimeoutFlag_WhenSpecified_ThenOverrideDefault",
+		"GivenTimeoutFlag_WhenSpecified_ThenOverrideDefault": {
 			args: []string{"--symo.timeout", "3"},
 			verify: func(c *Configuration) {
 				assert.Equal(t, 3*time.Second, c.Symo.Timeout)
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			setEnv(tt.envs)
 			result := ParseConfig("version", "commit", "date", &tt.fs, tt.args)
 			tt.verify(result)
