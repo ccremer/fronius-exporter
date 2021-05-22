@@ -38,17 +38,8 @@ nfpms:
   - deb
   - rpm
 
-changelog:
-  sort: asc
-  filters:
-    exclude:
-    - '^Docs:'
-    - '^Test:'
-    - '^Refactor:'
-    - '^Merge pull request'
-    - '^GH:'
-
 release:
+  prerelease: auto
   github:
     owner: ccremer
     name: fronius-exporter
