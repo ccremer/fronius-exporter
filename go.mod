@@ -1,6 +1,6 @@
-module fronius-exporter
+module github.com/ccremer/fronius-exporter
 
-go 1.14
+go 1.16
 
 require (
 	github.com/prometheus/client_golang v1.9.0
