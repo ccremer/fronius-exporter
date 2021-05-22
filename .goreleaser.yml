@@ -25,7 +25,15 @@ signs:
 dockers:
 - image_templates:
   - "docker.io/ccremer/fronius-exporter:v{{ .Version }}"
-  - "docker.io/ccremer/fronius-exporter:v{{ .Major }}"
+  - "quay.io/ccremer/fronius-exporter:v{{ .Version }}"
+
+    # For prereleases, updating `latest` and the floating tags of the major version does not make sense.
+    # Only the image for the exact version should be pushed.
+  - "{{ if not .Prerelease }}docker.io/ccremer/fronius-exporter:v{{ .Major }}{{ end }}"
+  - "{{ if not .Prerelease }}quay.io/ccremer/fronius-exporter:v{{ .Major }}{{ end }}"
+
+  - "{{ if not .Prerelease }}docker.io/ccremer/fronius-exporter:latest{{ end }}"
+  - "{{ if not .Prerelease }}quay.io/ccremer/fronius-exporter:latest{{ end }}"
 
 nfpms:
 - vendor: ccremer

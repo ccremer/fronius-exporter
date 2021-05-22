@@ -39,7 +39,7 @@ image::examples/grafana.png[Grafana]
 
 === Docker
 
-. `docker run -d --name fronius-exporter -p "8080:8080" ccremer/fronius-exporter`
+. `docker run -d --name fronius-exporter -p "8080:8080" quay.io/ccremer/fronius-exporter`
 
 === Helm Chart
 
