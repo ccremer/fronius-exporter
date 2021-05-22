@@ -1,14 +1,15 @@
 package main
 
 import (
-	"fronius-exporter/cfg"
-	"fronius-exporter/pkg/fronius"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
-	flag "github.com/spf13/pflag"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/ccremer/fronius-exporter/cfg"
+	"github.com/ccremer/fronius-exporter/pkg/fronius"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	log "github.com/sirupsen/logrus"
+	flag "github.com/spf13/pflag"
 )
 
 var (

@@ -1,22 +1,17 @@
 name: Build
 
 on:
-  push:
-    branches:
-    - "*"
-    tags-ignore:
-    - "*"
   pull_request:
-    types: [opened, reopened]
-
-env:
-  GO_VERSION: "^1.14.3"
+    branches:
+      - master
 
 jobs:
-  goreleaser:
+  docker:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+    - name: Determine Go version from go.mod
+      run: echo "GO_VERSION=$(grep "go 1." go.mod | cut -d " " -f 2)" >> $GITHUB_ENV
     - uses: actions/setup-go@v2
       with:
         go-version: ${{ env.GO_VERSION }}
@@ -26,45 +21,5 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
-    - uses: goreleaser/goreleaser-action@v2
-      with:
-        args: release --snapshot --skip-sign
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-go@v2
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - uses: actions/cache@v2
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: Test & Publish Code Coverage
-      uses: paambaati/codeclimate-action@v2.6.0
-      env:
-        CC_TEST_REPORTER_ID: 38a41dde51e26878e774848c2654bba1082ad39703571505e877575b2a9695e3
-      with:
-        coverageCommand: make test
-        prefix: ${{ github.event.repository.name }}
-        coverageLocations:
-          "${{github.workspace}}/c.out:gocov"
-
-  formatting:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-go@v2
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - uses: actions/cache@v2
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: Verify if Code needs formatting
-      run: make fmt
+    - name: Run docker build
+      run: make build:docker

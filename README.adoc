@@ -18,6 +18,7 @@ image:https://img.shields.io/codeclimate/coverage/ccremer/fronius-exporter[Tests
 image:https://img.shields.io/github/v/release/ccremer/fronius-exporter[Releases,link=https://github.com/ccremer/fronius-exporter/releases]
 image:https://img.shields.io/github/license/ccremer/fronius-exporter[License,link=https://github.com/ccremer/fronius-exporter/blob/master/LICENSE]
 image:https://img.shields.io/docker/pulls/ccremer/fronius-exporter[Docker image,link=https://hub.docker.com/r/ccremer/fronius-exporter]
+image:https://quay.io/repository/ccremer/fronius-exporter/status[Docker Repository on Quay,link=https://quay.io/repository/ccremer/fronius-exporter]
 endif::[]
 
 == About
@@ -39,7 +40,7 @@ image::examples/grafana.png[Grafana]
 
 === Docker
 
-. `docker run -d --name fronius-exporter -p "8080:8080" ccremer/fronius-exporter`
+. `docker run -d --name fronius-exporter -p "8080:8080" quay.io/ccremer/fronius-exporter`
 
 === Helm Chart
 
@@ -62,9 +63,12 @@ response to Prometheus metrics format.
 
 `fronius-exporter` can be configured with CLI flags. Call the binary with `--help` to get a list of options.
 
-TIP: All flags are also configurable with Environment variables. Replace the `.` char with `_` and
-     uppercase the names in order for them to be recognized, e.g. `--log.level debug` becomes
-     `LOG_LEVEL=debug`. CLI flags take precedence though.
+[TIP]
+====
+All flags are also configurable with Environment variables.
+Replace the `.` char with `_` and uppercase the names in order for them to be recognized, e.g. `--log.level debug` becomes `LOG_LEVEL=debug`.
+CLI flags take precedence though.
+====
 
 == As a client API
 
@@ -75,12 +79,8 @@ See link:examples/client.go[Example]
 === Requirements
 
 * Go
-* https://github.com/goreleaser/goreleaser[Goreleaser] (for packaging)
+* Docker
 
 === Building
 
-. `make build`
-
-=== Tests
-
-. `make test`
+Run `make help` to see available goals

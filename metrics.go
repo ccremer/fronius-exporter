@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fronius-exporter/pkg/fronius"
+	"time"
+
+	"github.com/ccremer/fronius-exporter/pkg/fronius"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 var (
