@@ -56,18 +56,26 @@ With https://ccremer.github.io/charts/fronius-exporter[fronius-exporter]
 fronius-exporter --url http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi
 ----
 
-Upon each call to `/metrics`, the exporter will do a GET request on the given URL, and translate the JSON
-response to Prometheus metrics format.
+Upon each call to `/metrics`, the exporter will do a GET request on the given URL, and translate the JSON response to Prometheus metrics format.
 
 == Configuration
 
-`fronius-exporter` can be configured with CLI flags. Call the binary with `--help` to get a list of options.
+`fronius-exporter` can be configured with CLI flags.
+Call the binary with `--help` to get a list of options.
 
 [TIP]
 ====
 All flags are also configurable with Environment variables.
-Replace the `.` char with `_` and uppercase the names in order for them to be recognized, e.g. `--log.level debug` becomes `LOG_LEVEL=debug`.
-CLI flags take precedence though.
+
+* Replace the `-` char with `_` in the names and uppercase the names
+* Replace the `.` delimiter with `__`
+* CLI flags take precedence
+
+.Following calls are requivalent
+----
+fronius-exporter --symo.url http://...
+SYMO__URL=http://... fronius-exporter
+----
 ====
 
 == As a client API
