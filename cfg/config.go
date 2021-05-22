@@ -2,13 +2,14 @@ package cfg
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	flag "github.com/spf13/pflag"
-	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
+	flag "github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 // ParseConfig overrides internal config defaults with up CLI flags, environment variables and ensures basic validation.

@@ -1,12 +1,13 @@
 package cfg
 
 import (
-	flag "github.com/spf13/pflag"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"os"
 	"testing"
 	"time"
+
+	flag "github.com/spf13/pflag"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConvertHeaders(t *testing.T) {
