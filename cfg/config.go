@@ -3,6 +3,7 @@ package cfg
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -39,6 +40,7 @@ func setupCliFlags(version string, fs *flag.FlagSet, config *Configuration) {
 	fs.StringSlice("symo.header", config.Symo.Headers,
 		"List of \"key: value\" headers to append to the requests going to Fronius Symo. Example: --symo.header \"authorization=Basic <base64>\".")
 	fs.StringP("symo.url", "u", config.Symo.URL, "Target URL of Fronius Symo device.")
+	fs.StringP("symo.site", "s", config.Symo.Site, "Site name of the Fronius Symo device, it's added as a static label to the metrics. Defaults to the hostname in --symo.url.")
 	fs.Int64("symo.timeout", int64(config.Symo.Timeout.Seconds()),
 		"Timeout in seconds when collecting metrics from Fronius Symo. Should not be larger than the scrape interval.")
 
@@ -55,6 +57,8 @@ func postLoadProcess(config *Configuration) {
 		parsedHeaders = splitHeaderStrings(header, parsedHeaders)
 	}
 	config.Symo.Headers = parsedHeaders
+
+	config.Symo.Site = getSiteOrHostName(config.Symo.Site, config.Symo.URL)
 
 	level, err := log.ParseLevel(config.Log.Level)
 	if err != nil {
@@ -129,4 +133,18 @@ func ConvertHeaders(headers []string, header *http.Header) {
 		}).Debug("Using header")
 		header.Set(key, value)
 	}
+}
+
+// getSiteOrHostName returns the site name as it was given in the config.
+// If that's empty, it returns the hostname or IP address given in the Symo URL.
+// If the URL cannot be parsed either, it returns empty string.
+func getSiteOrHostName(site, rawURL string) string {
+	if site != "" {
+		return site
+	}
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return ""
+	}
+	return u.Host
 }
