@@ -40,7 +40,7 @@ image::examples/grafana.png[Grafana]
 
 === Docker
 
-. `docker run -d --name fronius-exporter -p "8080:8080" quay.io/ccremer/fronius-exporter`
+. `docker run -d --name fronius-exporter -p "8080:8080" quay.io/ccremer/fronius-exporter --help`
 
 === Helm Chart
 
@@ -53,7 +53,7 @@ With https://ccremer.github.io/charts/fronius-exporter[fronius-exporter]
 
 [source,console]
 ----
-fronius-exporter --url http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi
+fronius-exporter --symo.url http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi
 ----
 
 Upon each call to `/metrics`, the exporter will do a GET request on the given URL, and translate the JSON response to Prometheus metrics format.
@@ -71,7 +71,7 @@ All flags are also configurable with Environment variables.
 * Replace the `.` delimiter with `__`
 * CLI flags take precedence
 
-.Following calls are requivalent
+.Following calls are equivalent
 ----
 fronius-exporter --symo.url http://...
 SYMO__URL=http://... fronius-exporter
