@@ -17,6 +17,7 @@ type (
 	// SymoConfig configures the Fronius Symo device
 	SymoConfig struct {
 		URL     string        `koanf:"url"`
+		Site    string        `koanf:"site"`
 		Timeout time.Duration `koanf:"timeout"`
 		Headers []string      `koanf:"header"`
 	}

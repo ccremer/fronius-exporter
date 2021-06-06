@@ -212,3 +212,33 @@ func Test_parseHeaderString(t *testing.T) {
 		})
 	}
 }
+
+func Test_getSiteOrHostName(t *testing.T) {
+	tests := map[string]struct {
+		site     string
+		url      string
+		expected string
+	}{
+		"GivenEmptySite_ThenReturnHostnameFromURL": {
+			site:     "",
+			url:      "http://hostname.tld:8080/somepath",
+			expected: "hostname.tld:8080",
+		},
+		"GivenConfiguredSite_ThenReturnSameValue": {
+			site:     "my-site",
+			url:      "http://hostname.tld:8080/somepath",
+			expected: "my-site",
+		},
+		"GivenEmptySite_WhenUrlInvalid_ThenReturnEmpty": {
+			site:     "",
+			url:      "hostname.tld",
+			expected: "",
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			result := getSiteOrHostName(tt.site, tt.url)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
