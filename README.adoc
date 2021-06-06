@@ -17,8 +17,7 @@ image:https://img.shields.io/codeclimate/maintainability/ccremer/fronius-exporte
 image:https://img.shields.io/codeclimate/coverage/ccremer/fronius-exporter[Tests,link=https://codeclimate.com/github/ccremer/fronius-exporter]
 image:https://img.shields.io/github/v/release/ccremer/fronius-exporter[Releases,link=https://github.com/ccremer/fronius-exporter/releases]
 image:https://img.shields.io/github/license/ccremer/fronius-exporter[License,link=https://github.com/ccremer/fronius-exporter/blob/master/LICENSE]
-image:https://img.shields.io/docker/pulls/ccremer/fronius-exporter[Docker image,link=https://hub.docker.com/r/ccremer/fronius-exporter]
-image:https://quay.io/repository/ccremer/fronius-exporter/status[Docker Repository on Quay,link=https://quay.io/repository/ccremer/fronius-exporter]
+image:https://img.shields.io/badge/container-quay.io-blue[Container image,link=https://quay.io/repository/ccremer/fronius-exporter?tab=tags]
 endif::[]
 
 == About
