@@ -160,8 +160,8 @@ github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7V
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/knadh/koanf v1.0.0 h1:tGQ1L53Tp4uPx6agVGBN1U7A4f83ZpH3SwZNG+BkfqI=
-github.com/knadh/koanf v1.0.0/go.mod h1:vrMMuhIH0k7EoxiMbVfFlRvJYmxcT2Eha3DH8Tx5+X4=
+github.com/knadh/koanf v1.1.0 h1:Qnluc9h+ASKx9VdUqmS0WhFretOztzygb96MY1km8UY=
+github.com/knadh/koanf v1.1.0/go.mod h1:vrMMuhIH0k7EoxiMbVfFlRvJYmxcT2Eha3DH8Tx5+X4=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
