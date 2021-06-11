@@ -31,6 +31,7 @@ type (
 			// RelativeSelfConsumption indicates the ratio between the current power generated and the
 			// current load. When it reaches 1, the RelativeAutonomy declines, since the site can not produce enough
 			// energy and needs support from the grid.
+			// If the device returns null in PowerPhotovoltaic, this field becomes also 0!
 			RelativeSelfConsumption float64 `json:"rel_SelfConsumption"`
 			// RelativeAutonomy is the ratio of how autonomous the installation is. An autonomy of 1 means that
 			// the site is producing more energy than it is needed.

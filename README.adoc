@@ -91,3 +91,19 @@ See link:examples/client.go[Example]
 === Building
 
 Run `make help` to see available goals
+
+=== Test metrics
+
+If you don't have a Symo device at hand, you can fake one:
+
+[source,console]
+----
+# In its own terminal
+python3 -m http.server 8081
+
+# In another terminal
+go run . -v --symo.url http://localhost:8081/pkg/fronius/testdata/example_1.json
+
+# Yet another terminal or browser
+curl -L http://localhost:8080/metrics
+----

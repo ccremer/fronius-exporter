@@ -115,6 +115,10 @@ func parseMetrics(data *fronius.SymoData) {
 	siteEnergyGaugeVec.WithLabelValues("year").Set(data.Site.EnergyYear)
 	siteEnergyGaugeVec.WithLabelValues("total").Set(data.Site.EnergyTotal)
 
-	siteAutonomyRatioGauge.Set(data.Site.RelativeAutonomy)
-	siteSelfConsumptionRatioGauge.Set(data.Site.RelativeSelfConsumption)
+	siteAutonomyRatioGauge.Set(data.Site.RelativeAutonomy / 100)
+	if data.Site.PowerPhotovoltaic == 0 {
+		siteSelfConsumptionRatioGauge.Set(1)
+	} else {
+		siteSelfConsumptionRatioGauge.Set(data.Site.RelativeSelfConsumption / 100)
+	}
 }
