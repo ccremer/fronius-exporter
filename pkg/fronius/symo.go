@@ -19,8 +19,8 @@ type (
 		Site      struct {
 			Mode          string `json:"Mode"`
 			MeterLocation string `json:"Meter_Location"`
-			// PowerGrid is the power supplied by the grid in Watt. A negative value means that excess power is provided
-			// back to the grid.
+			// PowerGrid is the power supplied by the grid in Watt.
+			// A negative value means that excess power is provided back to the grid.
 			PowerGrid float64 `json:"P_Grid"`
 			// PowerLoad is the current load in Watt.
 			PowerLoad float64 `json:"P_Load"`
@@ -28,21 +28,20 @@ type (
 			PowerAccu float64 `json:"P_Akku"`
 			// PowerPhotovoltaic is the current power coming from Photovoltaic in Watt.
 			PowerPhotovoltaic float64 `json:"P_PV"`
-			// RelativeSelfConsumption indicates the ratio between the current power generated and the
-			// current load. When it reaches 1, the RelativeAutonomy declines, since the site can not produce enough
-			// energy and needs support from the grid.
+			// RelativeSelfConsumption indicates the ratio between the current power generated and the current load.
+			// When it reaches 100, the RelativeAutonomy declines, since the site can not produce enough energy and needs support from the grid.
 			// If the device returns null in PowerPhotovoltaic, this field becomes also 0!
 			RelativeSelfConsumption float64 `json:"rel_SelfConsumption"`
-			// RelativeAutonomy is the ratio of how autonomous the installation is. An autonomy of 1 means that
-			// the site is producing more energy than it is needed.
+			// RelativeAutonomy is the ratio of how autonomous the installation is.
+			// An autonomy of 100 means that the site is producing more energy than it is needed.
 			RelativeAutonomy float64 `json:"rel_Autonomy"`
-			// EnergyDay is the accumulated energy in kWh generated in this day so far. It is reset at the device's
-			// configured timezone at midnight.
+			// EnergyDay is the accumulated energy in Wh generated in this day so far.
+			// It is reset at the device's configured timezone at midnight.
 			EnergyDay float64 `json:"E_Day"`
-			// EnergyYear is the accumulated energy in kWh generated in this year so far. It is reset at the device's
-			// configured timezone at midnight of 31st of December.
+			// EnergyYear is the accumulated energy in Wh generated in this year so far.
+			// It is reset at the device's configured timezone at midnight of 31st of December.
 			EnergyYear float64 `json:"E_Year"`
-			// EnergyYear is the accumulated energy in kWh generated in this site so far.
+			// EnergyTotal is the accumulated energy in Wh generated in this site so far.
 			EnergyTotal float64 `json:"E_Total"`
 		}
 	}
