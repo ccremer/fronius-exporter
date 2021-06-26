@@ -49,6 +49,7 @@ type (
 	Inverter struct {
 		DT          float64 `json:"DT"`
 		Power       float64 `json:"P"`
+		BatterySoC  float64 `json:"SOC"`
 		EnergyDay   float64 `json:"E_Day"`
 		EnergyYear  float64 `json:"E_Year"`
 		EnergyTotal float64 `json:"E_Total"`

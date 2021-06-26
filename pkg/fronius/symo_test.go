@@ -14,7 +14,7 @@ func Test_Symo_GetPowerFlowData_GivenUrl_WhenRequestData_ThenParseStruct(t *test
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		payload, err := ioutil.ReadFile("testdata/example_1.json")
 		require.NoError(t, err)
-		rw.Write(payload)
+		_, _ = rw.Write(payload)
 	}))
 
 	c, err := NewSymoClient(ClientOptions{
@@ -33,4 +33,6 @@ func Test_Symo_GetPowerFlowData_GivenUrl_WhenRequestData_ThenParseStruct(t *test
 	assert.Equal(t, float64(22997), p.Site.EnergyDay)
 	assert.Equal(t, float64(43059100), p.Site.EnergyTotal)
 	assert.Equal(t, 3525577.75, p.Site.EnergyYear)
+
+	assert.Equal(t, 34.5, p.Inverters["1"].BatterySoC)
 }
