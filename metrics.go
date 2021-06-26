@@ -27,6 +27,11 @@ var (
 		Name:      "inverter_power",
 		Help:      "Power flow of the inverter in Watt",
 	}, []string{"inverter"})
+	inverterBatteryChargeGaugeVec = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "inverter_soc",
+		Help:      "State of charge of the battery attached to the inverter in percent",
+	}, []string{"inverter"})
 
 	sitePowerLoadGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
@@ -89,6 +94,7 @@ func parseMetrics(data *fronius.SymoData) {
 	log.WithField("data", *data).Debug("Parsing data.")
 	for key, inverter := range data.Inverters {
 		inverterPowerGaugeVec.WithLabelValues(key).Set(inverter.Power)
+		inverterBatteryChargeGaugeVec.WithLabelValues(key).Set(inverter.BatterySoC / 100)
 	}
 	sitePowerAccuGauge.Set(data.Site.PowerAccu)
 	sitePowerGridGauge.Set(data.Site.PowerGrid)
