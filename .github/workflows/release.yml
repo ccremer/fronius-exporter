@@ -1,3 +1,7 @@
+# This file is managed by greposync.
+# Do not modify manually.
+# Adjust variables in `.sync.yml`.
+# 
 name: Release
 
 on:
@@ -44,8 +48,8 @@ jobs:
       with:
         configuration: ".github/changelog-configuration.json"
         # PreReleases still get a changelog, but the next full release gets a diff since the last full release,
-        # combining possible changelogs of all previous PreReleases in between. PreReleases show a partial changelog
-        # since last PreRelease.
+        # combining possible changelogs of all previous PreReleases in between.
+        # PreReleases show a partial changelog since last PreRelease.
         ignorePreReleases: "${{ !contains(github.ref, '-rc') }}"
         outputFile: .github/release-notes.md
       env:
