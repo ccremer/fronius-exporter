@@ -70,28 +70,55 @@ var (
 		Name:      "site_energy_consumption",
 		Help:      "Energy consumption in kWh",
 	}, []string{"time_frame"})
+
+	siteMPPTVoltageGaugeVec = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_mppt_voltage",
+		Help:      "Site mppt voltage in V",
+	}, []string{"inverter", "mppt"})
+
+	siteMPPTCurrentDCGaugeVec = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_mppt_current_dc",
+		Help:      "Site mppt current DC in A",
+	}, []string{"inverter", "mppt"})
 )
 
 func collectMetricsFromTarget(client *fronius.SymoClient) {
 	start := time.Now()
 	log.WithFields(log.Fields{
-		"url":     client.Options.URL,
-		"timeout": client.Options.Timeout,
+		"url":              client.Options.URL,
+		"timeout":          client.Options.Timeout,
+		"powerFlowEnabled": client.Options.PowerFlowEnabled,
+		"archiveEnabled":   client.Options.ArchiveEnabled,
 	}).Debug("Requesting data.")
-	data, err := client.GetPowerFlowData()
-	if err != nil {
-		log.WithError(err).Warn("Could not collect Symo metrics.")
-		scrapeErrorCount.Add(1)
-	} else {
-		parseMetrics(data)
+
+	if client.Options.PowerFlowEnabled {
+		powerFlowData, err := client.GetPowerFlowData()
+		if err != nil {
+			log.WithError(err).Warn("Could not collect Symo power metrics.")
+			scrapeErrorCount.Add(1)
+		} else {
+			parsePowerFlowMetrics(powerFlowData)
+		}
+	}
+
+	if client.Options.ArchiveEnabled {
+		archiveData, err := client.GetArchiveData()
+		if err != nil {
+			log.WithError(err).Warn("Could not collect Symo archive metrics.")
+			scrapeErrorCount.Add(1)
+		} else {
+			parseArchiveMetrics(archiveData)
+		}
 	}
 
 	elapsed := time.Since(start)
 	scrapeDurationGauge.Set(elapsed.Seconds())
 }
 
-func parseMetrics(data *fronius.SymoData) {
-	log.WithField("data", *data).Debug("Parsing data.")
+func parsePowerFlowMetrics(data *fronius.SymoData) {
+	log.WithField("powerFlowData", *data).Debug("Parsing data.")
 	for key, inverter := range data.Inverters {
 		inverterPowerGaugeVec.WithLabelValues(key).Set(inverter.Power)
 		inverterBatteryChargeGaugeVec.WithLabelValues(key).Set(inverter.BatterySoC / 100)
@@ -110,5 +137,15 @@ func parseMetrics(data *fronius.SymoData) {
 		siteSelfConsumptionRatioGauge.Set(1)
 	} else {
 		siteSelfConsumptionRatioGauge.Set(data.Site.RelativeSelfConsumption / 100)
+	}
+}
+
+func parseArchiveMetrics(data map[string]fronius.InverterArchive) {
+	log.WithField("archiveData", data).Debug("Parsing data.")
+	for key, inverter := range data {
+		siteMPPTCurrentDCGaugeVec.WithLabelValues(key, "1").Set(inverter.Data.CurrentDCString1.Values["0"])
+		siteMPPTCurrentDCGaugeVec.WithLabelValues(key, "2").Set(inverter.Data.CurrentDCString2.Values["0"])
+		siteMPPTVoltageGaugeVec.WithLabelValues(key, "1").Set(inverter.Data.VoltageDCString1.Values["0"])
+		siteMPPTVoltageGaugeVec.WithLabelValues(key, "2").Set(inverter.Data.VoltageDCString2.Values["0"])
 	}
 }

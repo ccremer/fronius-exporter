@@ -41,7 +41,8 @@ func setupCliFlags(version string, fs *flag.FlagSet, config *Configuration) {
 	fs.StringP("symo.url", "u", config.Symo.URL, "Target URL of Fronius Symo device.")
 	fs.Int64("symo.timeout", int64(config.Symo.Timeout.Seconds()),
 		"Timeout in seconds when collecting metrics from Fronius Symo. Should not be larger than the scrape interval.")
-
+	fs.Bool("symo.enable-power-flow", config.Symo.PowerFlowEnabled, "Enable/disable scraping of power flow data")
+	fs.Bool("symo.enable-archive", config.Symo.ArchiveEnabled, "Enable/disable scraping of archive data")
 }
 
 func postLoadProcess(config *Configuration) {

@@ -16,9 +16,11 @@ type (
 	}
 	// SymoConfig configures the Fronius Symo device
 	SymoConfig struct {
-		URL     string        `koanf:"url"`
-		Timeout time.Duration `koanf:"timeout"`
-		Headers []string      `koanf:"header"`
+		URL              string        `koanf:"url"`
+		Timeout          time.Duration `koanf:"timeout"`
+		Headers          []string      `koanf:"header"`
+		PowerFlowEnabled bool          `koanf:"enable-power-flow"`
+		ArchiveEnabled   bool          `koanf:"enable-archive"`
 	}
 )
 
@@ -29,9 +31,11 @@ func NewDefaultConfig() *Configuration {
 			Level: "info",
 		},
 		Symo: SymoConfig{
-			URL:     "http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi",
-			Timeout: 5 * time.Second,
-			Headers: []string{},
+			URL:              "http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi",
+			Timeout:          5 * time.Second,
+			Headers:          []string{},
+			PowerFlowEnabled: true,
+			ArchiveEnabled:   true,
 		},
 		BindAddr: ":8080",
 	}
