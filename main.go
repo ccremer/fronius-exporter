@@ -30,9 +30,11 @@ func main() {
 	headers := http.Header{}
 	cfg.ConvertHeaders(config.Symo.Headers, &headers)
 	symoClient, err := fronius.NewSymoClient(fronius.ClientOptions{
-		URL:     config.Symo.URL,
-		Headers: headers,
-		Timeout: config.Symo.Timeout,
+		URL:              config.Symo.URL,
+		Headers:          headers,
+		Timeout:          config.Symo.Timeout,
+		PowerFlowEnabled: config.Symo.PowerFlowEnabled,
+		ArchiveEnabled:   config.Symo.ArchiveEnabled,
 	})
 	if err != nil {
 		log.WithError(err).Fatal("Cannot initialize Fronius Symo client.")

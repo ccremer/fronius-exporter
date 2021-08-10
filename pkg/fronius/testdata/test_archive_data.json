@@ -1,0 +1,68 @@
+{
+    "Body": {
+        "Data": {
+            "inverter/1": {
+                "Data": {
+                    "Current_DC_String_1": {
+                        "Unit": "A",
+                        "Values": {
+                            "0": 13
+                        },
+                        "_comment": "channelId=66050"
+                    },
+                    "Current_DC_String_2": {
+                        "Unit": "A",
+                        "Values": {
+                            "0": 15.92
+                        },
+                        "_comment": "channelId=131586"
+                    },
+                    "Voltage_DC_String_1": {
+                        "Unit": "V",
+                        "Values": {
+                            "0": 425.60000000000002
+                        },
+                        "_comment": "channelId=66049"
+                    },
+                    "Voltage_DC_String_2": {
+                        "Unit": "V",
+                        "Values": {
+                            "0": 408.90000000000003
+                        },
+                        "_comment": "channelId=131585"
+                    }
+                },
+                "DeviceType": 233,
+                "End": "2021-07-29T12:09:59+02:00",
+                "NodeType": 97,
+                "Start": "2021-07-29T12:05:00+02:00"
+            }
+        }
+    },
+    "Head": {
+        "RequestArguments": {
+            "Channel": [
+                "Voltage_DC_String_1",
+                "Current_DC_String_1",
+                "Voltage_DC_String_2",
+                "Current_DC_String_2"
+            ],
+            "DeviceClass": "Inverter",
+            "DeviceId": "1",
+            "EndDate": "2021-07-30T12:09:59+02:00",
+            "HumanReadable": "True",
+            "Scope": "Device",
+            "SeriesType": "Detail",
+            "StartDate": "2021-07-29T12:05:00+02:00"
+        },
+        "Status": {
+            "Code": 0,
+            "ErrorDetail": {
+                "Nodes": []
+            },
+            "Reason": "",
+            "UserMessage": ""
+        },
+        "Timestamp": "2021-08-05T15:39:00+02:00"
+    }
+}

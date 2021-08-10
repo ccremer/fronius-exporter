@@ -2,9 +2,17 @@ package fronius
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
+)
+
+const (
+	// PowerDataPath is the Fronius API URL-path for power real time data
+	PowerDataPath = "/solar_api/v1/GetPowerFlowRealtimeData.fcgi"
+	// ArchiveDataPath is the Fronius API URL-path for archive data
+	ArchiveDataPath = "/solar_api/v1/GetArchiveData.cgi?Scope=System&Channel=Voltage_DC_String_1&Channel=Current_DC_String_1&Channel=Voltage_DC_String_2&Channel=Current_DC_String_2&HumanReadable=false"
 )
 
 type (
@@ -54,6 +62,30 @@ type (
 		EnergyYear  float64 `json:"E_Year"`
 		EnergyTotal float64 `json:"E_Total"`
 	}
+
+	// SymoArchive holds the parsed archive data from Symo API
+	symoArchive struct {
+		Body struct {
+			Data map[string]InverterArchive
+		}
+	}
+
+	// InverterArchive represents a power archive data with its channels
+	InverterArchive struct {
+		Data struct {
+			CurrentDCString1 Channel `json:"Current_DC_String_1"`
+			CurrentDCString2 Channel `json:"Current_DC_String_2"`
+			VoltageDCString1 Channel `json:"Voltage_DC_String_1"`
+			VoltageDCString2 Channel `json:"Voltage_DC_String_2"`
+		}
+	}
+
+	// Channel represents the inverter channel data
+	Channel struct {
+		Unit   string
+		Values map[string]float64
+	}
+
 	// SymoClient is a wrapper for making API requests against a Fronius Symo device.
 	SymoClient struct {
 		request *http.Request
@@ -61,21 +93,18 @@ type (
 	}
 	// ClientOptions holds some parameters for the SymoClient.
 	ClientOptions struct {
-		URL     string
-		Headers http.Header
-		Timeout time.Duration
+		URL              string
+		Headers          http.Header
+		Timeout          time.Duration
+		PowerFlowEnabled bool
+		ArchiveEnabled   bool
 	}
 )
 
 // NewSymoClient constructs a SymoClient ready to use for collecting metrics.
 func NewSymoClient(options ClientOptions) (*SymoClient, error) {
-	u, err := url.Parse(options.URL)
-	if err != nil {
-		return nil, err
-	}
 	return &SymoClient{
 		request: &http.Request{
-			URL:    u,
 			Header: options.Headers,
 		},
 		Options: options,
@@ -84,6 +113,13 @@ func NewSymoClient(options ClientOptions) (*SymoClient, error) {
 
 // GetPowerFlowData returns the parsed data from the Symo device.
 func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
+	url, err := url.Parse(c.Options.URL + PowerDataPath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	c.request.URL = url
 	client := http.DefaultClient
 	client.Timeout = c.Options.Timeout
 	response, err := client.Do(c.request)
@@ -97,4 +133,38 @@ func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
 		return nil, err
 	}
 	return &p.Body.Data, nil
+}
+
+// GetArchiveData returns the parsed data from the Symo device.
+func (c *SymoClient) GetArchiveData() (map[string]InverterArchive, error) {
+	url, err := url.Parse(c.Options.URL + ArchiveDataPath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	c.request.URL = url
+	client := http.DefaultClient
+	client.Timeout = c.Options.Timeout
+	q := c.request.URL.Query()
+	q.Del("StartDate")
+	q.Del("EndDate")
+
+	c.request.URL.RawQuery = fmt.Sprintf("%s&StartDate=%s&EndDate=%s",
+		q.Encode(),
+		time.Now().Truncate(5*time.Minute).UTC().Local().Format(time.RFC3339),
+		time.Now().Add(5*time.Minute).Truncate(5*time.Minute).UTC().Local().Format(time.RFC3339))
+
+	response, err := client.Do(c.request)
+
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	p := symoArchive{}
+	err = json.NewDecoder(response.Body).Decode(&p)
+	if err != nil {
+		return nil, err
+	}
+	return p.Body.Data, nil
 }

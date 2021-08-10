@@ -52,7 +52,7 @@ With https://ccremer.github.io/charts/fronius-exporter[fronius-exporter]
 
 [source,console]
 ----
-fronius-exporter --symo.url http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi
+fronius-exporter --symo.url http://symo.ip.or.hostname
 ----
 
 Upon each call to `/metrics`, the exporter will do a GET request on the given URL, and translate the JSON response to Prometheus metrics format.
