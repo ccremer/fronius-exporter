@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"sync"
 	"time"
 
@@ -157,6 +158,7 @@ func parsePowerFlowMetrics(data *fronius.SymoData) {
 func parseArchiveMetrics(data map[string]fronius.InverterArchive) {
 	log.WithField("archiveData", data).Debug("Parsing data.")
 	for key, inverter := range data {
+		key = strings.TrimPrefix(key, "inverter/")
 		siteMPPTCurrentDCGaugeVec.WithLabelValues(key, "1").Set(inverter.Data.CurrentDCString1.Values["0"])
 		siteMPPTCurrentDCGaugeVec.WithLabelValues(key, "2").Set(inverter.Data.CurrentDCString2.Values["0"])
 		siteMPPTVoltageGaugeVec.WithLabelValues(key, "1").Set(inverter.Data.VoltageDCString1.Values["0"])
