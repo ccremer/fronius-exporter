@@ -113,13 +113,12 @@ func NewSymoClient(options ClientOptions) (*SymoClient, error) {
 
 // GetPowerFlowData returns the parsed data from the Symo device.
 func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
-	url, err := url.Parse(c.Options.URL + PowerDataPath)
-
+	u, err := url.Parse(c.Options.URL + PowerDataPath)
 	if err != nil {
 		return nil, err
 	}
 
-	c.request.URL = url
+	c.request.URL = u
 	client := http.DefaultClient
 	client.Timeout = c.Options.Timeout
 	response, err := client.Do(c.request)
@@ -137,13 +136,12 @@ func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
 
 // GetArchiveData returns the parsed data from the Symo device.
 func (c *SymoClient) GetArchiveData() (map[string]InverterArchive, error) {
-	url, err := url.Parse(c.Options.URL + ArchiveDataPath)
-
+	u, err := url.Parse(c.Options.URL + ArchiveDataPath)
 	if err != nil {
 		return nil, err
 	}
 
-	c.request.URL = url
+	c.request.URL = u
 	client := http.DefaultClient
 	client.Timeout = c.Options.Timeout
 	q := c.request.URL.Query()

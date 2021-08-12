@@ -39,6 +39,9 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal("Cannot initialize Fronius Symo client.")
 	}
+	if !config.Symo.ArchiveEnabled && !config.Symo.PowerFlowEnabled {
+		log.Fatal("All scrape endpoints are disabled. You need enable at least one endpoint.")
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
