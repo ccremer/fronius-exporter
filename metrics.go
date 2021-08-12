@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sync"
 	"time"
 
 	"github.com/ccremer/fronius-exporter/pkg/fronius"
@@ -93,28 +94,41 @@ func collectMetricsFromTarget(client *fronius.SymoClient) {
 		"archiveEnabled":   client.Options.ArchiveEnabled,
 	}).Debug("Requesting data.")
 
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	collectPowerFlowData(client, &wg)
+	collectArchiveData(client, &wg)
+
+	wg.Wait()
+	elapsed := time.Since(start)
+	scrapeDurationGauge.Set(elapsed.Seconds())
+}
+
+func collectPowerFlowData(client *fronius.SymoClient, w *sync.WaitGroup) {
+	defer w.Done()
 	if client.Options.PowerFlowEnabled {
 		powerFlowData, err := client.GetPowerFlowData()
 		if err != nil {
 			log.WithError(err).Warn("Could not collect Symo power metrics.")
 			scrapeErrorCount.Add(1)
-		} else {
-			parsePowerFlowMetrics(powerFlowData)
+			return
 		}
+		parsePowerFlowMetrics(powerFlowData)
 	}
+}
 
+func collectArchiveData(client *fronius.SymoClient, w *sync.WaitGroup) {
+	defer w.Done()
 	if client.Options.ArchiveEnabled {
 		archiveData, err := client.GetArchiveData()
 		if err != nil {
 			log.WithError(err).Warn("Could not collect Symo archive metrics.")
 			scrapeErrorCount.Add(1)
-		} else {
-			parseArchiveMetrics(archiveData)
+			return
 		}
+		parseArchiveMetrics(archiveData)
 	}
-
-	elapsed := time.Since(start)
-	scrapeDurationGauge.Set(elapsed.Seconds())
 }
 
 func parsePowerFlowMetrics(data *fronius.SymoData) {
