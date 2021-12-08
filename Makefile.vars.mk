@@ -1,7 +1,11 @@
+# This file is managed by greposync.
+# Do not modify manually.
+# Adjust variables in `.sync.yml`.
+
 # These are some common variables for Make
 
-IMG_TAG ?= latest
+BIN_FILENAME ?= fronius-exporter
 
 # Image URL to use all building/pushing image targets
-DOCKER_IMG ?= docker.io/ccremer/fronius-exporter:$(IMG_TAG)
-QUAY_IMG ?= quay.io/ccremer/fronius-exporter:$(IMG_TAG)
+IMG_TAG ?= latest
+LOCAL_IMG ?= local.dev/ccremer/fronius-exporter:$(IMG_TAG)
