@@ -16,39 +16,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine Go version from go.mod
-        run: echo "GO_VERSION=$(grep "go 1." go.mod | cut -d " " -f 2)" >> $GITHUB_ENV
-
-      - uses: actions/setup-go@v2
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Import GPG signing key
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.SIGNING_KEY }}
-
-      - name: Login to ghcr.io
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Login to quay.io
-        uses: docker/login-action@v1
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_IO_USER }}
-          password: ${{ secrets.QUAY_IO_PASSWORD }}
-
       - name: Build changelog from PRs with labels
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v2
@@ -58,13 +25,14 @@ jobs:
           # combining possible changelogs of all previous PreReleases in between.
           # PreReleases show a partial changelog since last PreRelease.
           ignorePreReleases: "${{ !contains(github.ref, '-rc') }}"
-          outputFile: .github/release-notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish releases
-        uses: goreleaser/goreleaser-action@v2
+      - name: Create Release
+        uses: ncipollo/release-action@v1
         with:
-          args: release --release-notes .github/release-notes.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          body: ${{steps.build_changelog.outputs.changelog}}
+          prerelease: "${{ contains(github.ref, '-rc') }}"
+          # Ensure target branch for release is "master"
+          commit: master
+          token: ${{ secrets.GITHUB_TOKEN }}
