@@ -31,52 +31,27 @@ dockers:
   build_flag_templates:
   - "--platform=linux/amd64"
   image_templates:
-  - "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-  - "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
+  - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
 
 - goarch: arm64
   use_buildx: true
   build_flag_templates:
     - "--platform=linux/arm64/v8"
   image_templates:
-  - "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
-  - "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+  - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
 
 docker_manifests:
-  # For prereleases, updating `latest` and the floating tags of the major version does not make sense.
+  # For prereleases, updating `latest` does not make sense.
   # Only the image for the exact version should be pushed.
-
-  # Quay.io
-- name_template: "{{ if not .Prerelease }}quay.io/{{ .Env.IMAGE_REPOSITORY }}:latest{{ end }}"
+- name_template: "{{ if not .Prerelease }}ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:latest{{ end }}"
   image_templates:
-    - "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-    - "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
+    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
 
-- name_template: "{{ if not .Prerelease }}quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Major }}{{ end }}"
+- name_template: "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}"
   image_templates:
-    - "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-    - "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
-
-- name_template: "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}"
-  image_templates:
-    - "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-    - "quay.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
-
-# Docker.io
-- name_template: "{{ if not .Prerelease }}docker.io/{{ .Env.IMAGE_REPOSITORY }}:latest{{ end }}"
-  image_templates:
-    - "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-    - "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
-
-- name_template: "{{ if not .Prerelease }}docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Major }}{{ end }}"
-  image_templates:
-    - "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-    - "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
-
-- name_template: "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}"
-  image_templates:
-    - "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-    - "docker.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
+    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
 
 nfpms:
 - vendor: ccremer
