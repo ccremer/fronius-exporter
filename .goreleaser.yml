@@ -9,7 +9,7 @@ builds:
   goos:
   - linux
   goarm:
-  - 8
+  - 7
 
 archives:
 - format: binary
@@ -34,11 +34,19 @@ dockers:
   - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
 
 - goarch: arm64
-  use_buildx: true
+  use: buildx
   build_flag_templates:
     - "--platform=linux/arm64/v8"
   image_templates:
   - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+
+- goarch: arm
+  goarm: "7"
+  use: buildx
+  build_flag_templates:
+    - "--platform=linux/arm/v7"
+  image_templates:
+  - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
 
 docker_manifests:
   # For prereleases, updating `latest` does not make sense.
@@ -47,11 +55,13 @@ docker_manifests:
   image_templates:
     - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
     - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
 
 - name_template: "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}"
   image_templates:
     - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
     - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
 
 nfpms:
 - vendor: ccremer
