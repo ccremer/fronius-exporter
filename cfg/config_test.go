@@ -147,6 +147,13 @@ func TestParseConfig(t *testing.T) {
 				assert.Equal(t, 3*time.Second, c.Symo.Timeout)
 			},
 		},
+		"GivenBasicAuth_ThenOverrideDefault": {
+			args: []string{"--basic-auth.username", "user", "--basic-auth.password", "pass"},
+			verify: func(c *Configuration) {
+				assert.Equal(t, "user", c.BasicAuth.Username)
+				assert.Equal(t, "pass", c.BasicAuth.Password)
+			},
+		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -165,7 +172,7 @@ func setEnv(m map[string]string) {
 }
 
 func unsetEnv(m map[string]string) {
-	for key, _ := range m {
+	for key := range m {
 		os.Unsetenv(key)
 	}
 }

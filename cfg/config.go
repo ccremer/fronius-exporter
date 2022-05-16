@@ -36,6 +36,8 @@ func setupCliFlags(version string, fs *flag.FlagSet, config *Configuration) {
 	fs.String("bind-addr", config.BindAddr, "IP Address to bind to listen for Prometheus scrapes.")
 	fs.String("log.level", config.Log.Level, "Logging level.")
 	fs.BoolP("log.verbose", "v", config.Log.Verbose, "Shortcut for --log.level=debug.")
+	fs.String("basic-auth.username", config.BasicAuth.Username, "Username for exporter basic auth.")
+	fs.String("basic-auth.password", config.BasicAuth.Password, "Password for exporter basic auth.")
 	fs.StringSlice("symo.header", config.Symo.Headers,
 		"List of \"key: value\" headers to append to the requests going to Fronius Symo. Example: --symo.header \"authorization=Basic <base64>\".")
 	fs.StringP("symo.url", "u", config.Symo.URL, "Target URL of Fronius Symo device.")

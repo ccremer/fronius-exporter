@@ -5,9 +5,10 @@ import "time"
 type (
 	// Configuration holds a strongly-typed tree of the configuration
 	Configuration struct {
-		Log      LogConfig  `koanf:"log"`
-		Symo     SymoConfig `koanf:"symo"`
-		BindAddr string     `koanf:"bind-addr"`
+		Log       LogConfig       `koanf:"log"`
+		Symo      SymoConfig      `koanf:"symo"`
+		BindAddr  string          `koanf:"bind-addr"`
+		BasicAuth BasicAuthConfig `koanf:"basic-auth"`
 	}
 	// LogConfig configures the logging options
 	LogConfig struct {
@@ -21,6 +22,11 @@ type (
 		Headers          []string      `koanf:"header"`
 		PowerFlowEnabled bool          `koanf:"enable-power-flow"`
 		ArchiveEnabled   bool          `koanf:"enable-archive"`
+	}
+
+	BasicAuthConfig struct {
+		Username string `koanf:"username"`
+		Password string `koanf:"password"`
 	}
 )
 
