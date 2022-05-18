@@ -49,6 +49,13 @@ func main() {
 		log.Fatal("All scrape endpoints are disabled. You need enable at least one endpoint.")
 	}
 
+	router := getHTTPRouter()
+
+	log.WithField("port", config.BindAddr).Info("Listening for scrapes.")
+	log.WithError(router.Run(config.BindAddr)).Fatal("Shutting down.")
+}
+
+func getHTTPRouter() *gin.Engine {
 	router := gin.Default()
 
 	rg := router.Group("/")
@@ -87,6 +94,5 @@ func main() {
 		promHandler.ServeHTTP(ctx.Writer, ctx.Request)
 	})
 
-	log.WithField("port", config.BindAddr).Info("Listening for scrapes.")
-	log.WithError(router.Run(config.BindAddr)).Fatal("Shutting down.")
+	return router
 }

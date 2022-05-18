@@ -24,6 +24,7 @@ type (
 		ArchiveEnabled   bool          `koanf:"enable-archive"`
 	}
 
+	// BasicAuthConfig stores the configuration for HTTP Basic Auth
 	BasicAuthConfig struct {
 		Username string `koanf:"username"`
 		Password string `koanf:"password"`
