@@ -33,9 +33,8 @@ lint: fmt vet ## Invokes the fmt and vet targets
 	git diff --exit-code
 
 .PHONY: build.docker
-build.docker: export CGO_ENABLED = 0
-build.docker: build ## Build the docker image
-	docker build --tag $(LOCAL_IMG)	.
+build.docker:
+		docker buildx build --platform $(PLATFORM) --tag $(LOCAL_IMG) .
 
 .PHONY: clean
 clean: ## Clean the project
