@@ -100,7 +100,7 @@ export IMAGE_REPOSITORY=ccremer/fronius-exporter
 goreleaser build --snapshot --rm-dist --single-target
 ----
 
-On the other hand you can also use the actual `make build` in comnbination with `docker buildx`
+On the other hand you can also use the actual `make build` in combination with `docker buildx`
 
 ----
 export GOOS=linux
