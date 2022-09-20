@@ -91,6 +91,28 @@ See link:examples/client.go[Example]
 
 Run `make help` to see available goals
 
+Platform related builds are handled by `goreleaser`:
+
+----
+export GOOS=linux
+export GOARCH=arm64
+export IMAGE_REPOSITORY=ccremer/fronius-exporter
+goreleaser build --snapshot --rm-dist --single-target
+----
+
+On the other hand you can also use the actual `make build` in combination with `docker buildx`
+
+----
+export GOOS=linux
+export GOARCH=arm64
+export IMAGE_REPOSITORY=ccremer/fronius-exporter
+
+make build
+# you now have a binary with arm64 arch
+
+docker buildx build --platform linux/arm64 -t $IMAGE_REPOSITORY --push .
+----
+
 === Test metrics
 
 If you don't have a Symo device at hand, you can fake one:
