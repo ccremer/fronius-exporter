@@ -39,7 +39,7 @@ dockers:
     build_flag_templates:
       - "--platform=linux/arm64/v8"
     image_templates:
-    - " ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
 
   - goarch: arm
     goarm: "7"
