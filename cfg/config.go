@@ -38,7 +38,7 @@ func setupCliFlags(version string, fs *flag.FlagSet, config *Configuration) {
 	fs.BoolP("log.verbose", "v", config.Log.Verbose, "Shortcut for --log.level=debug.")
 	fs.StringSlice("symo.header", config.Symo.Headers,
 		"List of \"key: value\" headers to append to the requests going to Fronius Symo. Example: --symo.header \"authorization=Basic <base64>\".")
-	fs.StringP("symo.url", "u", config.Symo.URL, "Target URL of Fronius Symo device.")
+	fs.StringP("symo.url", "u", config.Symo.URL, "Target base URL of Fronius Symo device.")
 	fs.Int64("symo.timeout", int64(config.Symo.Timeout.Seconds()),
 		"Timeout in seconds when collecting metrics from Fronius Symo. Should not be larger than the scrape interval.")
 	fs.Bool("symo.enable-power-flow", config.Symo.PowerFlowEnabled, "Enable/disable scraping of power flow data")

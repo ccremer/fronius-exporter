@@ -1,9 +1,9 @@
 package fronius
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +12,7 @@ import (
 
 func Test_Symo_GetPowerFlowData_GivenUrl_WhenRequestData_ThenParseStruct(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		payload, err := ioutil.ReadFile("testdata/example_1.json")
+		payload, err := os.ReadFile("testdata/example_1.json")
 		require.NoError(t, err)
 		_, _ = rw.Write(payload)
 	}))
@@ -39,7 +39,7 @@ func Test_Symo_GetPowerFlowData_GivenUrl_WhenRequestData_ThenParseStruct(t *test
 
 func Test_Symo_GetArchiveData_GivenUrl_WhenRequestData_ThenParseStruct(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		payload, err := ioutil.ReadFile("testdata/test_archive_data.json")
+		payload, err := os.ReadFile("testdata/test_archive_data.json")
 		require.NoError(t, err)
 		_, _ = rw.Write(payload)
 	}))
