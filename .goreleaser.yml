@@ -1,20 +1,20 @@
 # This is an example goreleaser.yaml file with some sane defaults.
 # Make sure to check the documentation at http://goreleaser.com
 builds:
-- env:
-  - CGO_ENABLED=0 # this is needed otherwise the Docker image build is faulty
-  goarch:
-  - amd64
-  - arm64
-  - arm
-  goos:
-  - linux
-  goarm:
-  - 7
+  - env:
+      - CGO_ENABLED=0 # this is needed otherwise the Docker image build is faulty
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goos:
+     - linux
+    goarm:
+     - 7
 
 archives:
-- format: binary
-  name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+  - format: binary
+    name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
 
 checksum:
   name_template: 'checksums.txt'
@@ -23,57 +23,63 @@ snapshot:
   name_template: "{{ .Tag }}-snapshot"
 
 signs:
-- artifacts: checksum
-  args: ["-u", "3E0B9A63FF344E7CB445BD84ED35499391B64DB4", "--output", "${signature}", "--detach-sign", "${artifact}"]
+  - artifacts: checksum
+    args: ["-u", "3E0B9A63FF344E7CB445BD84ED35499391B64DB4", "--output", "${signature}", "--detach-sign", "${artifact}"]
 
 dockers:
-- goarch: amd64
-  use: buildx
-  build_flag_templates:
-  - "--platform=linux/amd64"
-  image_templates:
-  - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
+  - goarch: amd64
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+    image_templates:
+      - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
 
-- goarch: arm64
-  use: buildx
-  build_flag_templates:
-    - "--platform=linux/arm64/v8"
-  image_templates:
-  - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+  - goarch: arm64
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+    image_templates:
+    - " ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
 
-- goarch: arm
-  goarm: "7"
-  use: buildx
-  build_flag_templates:
-    - "--platform=linux/arm/v7"
-  image_templates:
-  - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
+  - goarch: arm
+    goarm: "7"
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm/v7"
+    image_templates:
+      - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
 
 docker_manifests:
-  # For prereleases, updating `latest` does not make sense.
-  # Only the image for the exact version should be pushed.
-- name_template: "{{ if not .Prerelease }}ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:latest{{ end }}"
-  image_templates:
-    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
-    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
+    # For prereleases, updating `latest` does not make sense.
+    # Only the image for the exact version should be pushed.
+  - name_template: "{{ if not .Prerelease }}ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:latest{{ end }}"
+    image_templates:
+      - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
+      - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+      - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
 
-- name_template: "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}"
-  image_templates:
-    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
-    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
-    - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
+  - name_template: "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}"
+    image_templates:
+      - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-amd64"
+      - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-arm64"
+      - "ghcr.io/{{ .Env.IMAGE_REPOSITORY }}:v{{ .Version }}-armv7"
 
 nfpms:
-- vendor: ccremer
-  homepage: https://github.com/ccremer/fronius-exporter
-  maintainer: ccremer
-  description: Prometheus Exporter for Fronius Symo Photovoltaics
-  license: Apache 2.0
-  file_name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-  formats:
-  - deb
-  - rpm
+  - vendor: ccremer
+    homepage: https://github.com/ccremer/fronius-exporter
+    maintainer: ccremer
+    description: Prometheus Exporter for Fronius Symo Photovoltaics
+    license: Apache 2.0
+    file_name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - deb
+      - rpm
+    contents:
+      - src: examples/systemd.service
+        dst: /lib/systemd/system/fronius-exporter.service
+      - src: examples/systemd.env
+        dst: /etc/default/fronius-exporter
+        type: config
 
 release:
   prerelease: auto
