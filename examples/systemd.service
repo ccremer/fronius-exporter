@@ -1,0 +1,16 @@
+# This is a systemd unit file
+[Unit]
+Description=Prometheus Exporter for Fronius Symo Photovoltaics
+Documentation=https://github.com/ccremer/fronius-exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=-/etc/default/fronius-exporter
+User=65534
+Group=0
+ExecStart=/usr/bin/fronius-exporter
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

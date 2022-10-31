@@ -28,13 +28,22 @@ image::examples/grafana.png[Grafana]
 
 == Installing
 
+=== Binary
 
-=== Traditional packages or binary
-
-. Download latest binary or package from the https://github.com/ccremer/fronius-exporter/releases[Releases page]
-. `dpkg -i fronius-exporter_linux_amd64.deb` (Debian/Ubuntu)
-. `rpm -i fronius-exporter_linux_amd64.rpm` (CentOS)
+. Download latest binary from the https://github.com/ccremer/fronius-exporter/releases[Releases page]
 . `chmod +x fronius-exporter && mv fronius-exporter /usr/local/bin/`
+
+=== Package
+
+Comes with systemd unit file.
+
+. Download latest package from the https://github.com/ccremer/fronius-exporter/releases[Releases page]
+. `sudo dpkg -i fronius-exporter_linux_amd64.deb` (Debian/Ubuntu)
+. `sudo rpm -i fronius-exporter_linux_amd64.rpm` (CentOS)
+. `sudo systemctl daemon-reload`
+. Edit the settings in `/etc/default/fronius-exporter`
+. `sudo systemctl enable fronius-exporter`
+. `sudo systemctl restart fronius-exporter`
 
 === Docker
 

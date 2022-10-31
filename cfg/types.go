@@ -31,7 +31,7 @@ func NewDefaultConfig() *Configuration {
 			Level: "info",
 		},
 		Symo: SymoConfig{
-			URL:              "http://symo.ip.or.hostname/solar_api/v1/GetPowerFlowRealtimeData.fcgi",
+			URL:              "http://symo.ip.or.hostname",
 			Timeout:          5 * time.Second,
 			Headers:          []string{},
 			PowerFlowEnabled: true,
