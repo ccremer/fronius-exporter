@@ -43,6 +43,9 @@ func setupCliFlags(version string, fs *flag.FlagSet, config *Configuration) {
 		"Timeout in seconds when collecting metrics from Fronius Symo. Should not be larger than the scrape interval.")
 	fs.Bool("symo.enable-power-flow", config.Symo.PowerFlowEnabled, "Enable/disable scraping of power flow data")
 	fs.Bool("symo.enable-archive", config.Symo.ArchiveEnabled, "Enable/disable scraping of archive data")
+	fs.Bool("symo.enable-smart-meter", config.Symo.SmartMeterEnabled, "Enable/disable scraping of smart meter data")
+	fs.Float64("symo.offset-consumed", config.Symo.OffsetConsumed, "Offset for consumed")
+	fs.Float64("symo.offset-produced", config.Symo.OffsetProduced, "Offset for produced")
 }
 
 func postLoadProcess(config *Configuration) {

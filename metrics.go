@@ -53,7 +53,7 @@ var (
 	sitePowerPhotovoltaicsGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Name:      "site_power_photovoltaic",
-		Help:      "Site power supplied to or provided from the accumulator(s) in Watt",
+		Help:      "Site power from photovoltaic",
 	})
 
 	siteAutonomyRatioGauge = promauto.NewGauge(prometheus.GaugeOpts{
@@ -84,6 +84,16 @@ var (
 		Name:      "site_mppt_current_dc",
 		Help:      "Site mppt current DC in A",
 	}, []string{"inverter", "mppt"})
+	meterEnergyRealSumConsumedVec = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "meter_energy_consumed_wh",
+		Help:      "Meter consumed energy from grid in Wh",
+	}, []string{"device"})
+	meterEnergyRealSumProducedVec = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "meter_energy_produced_wh",
+		Help:      "Meter produced energy to grid in Wh",
+	}, []string{"device"})
 )
 
 func collectMetricsFromTarget(client *fronius.SymoClient) {
@@ -93,13 +103,15 @@ func collectMetricsFromTarget(client *fronius.SymoClient) {
 		"timeout":          client.Options.Timeout,
 		"powerFlowEnabled": client.Options.PowerFlowEnabled,
 		"archiveEnabled":   client.Options.ArchiveEnabled,
+		"meterEnabled":     client.Options.SmartMeterEnabled,
 	}).Debug("Requesting data.")
 
 	wg := sync.WaitGroup{}
-	wg.Add(2)
+	wg.Add(3)
 
 	collectPowerFlowData(client, &wg)
 	collectArchiveData(client, &wg)
+	collectSmartMeterData(client, &wg)
 
 	wg.Wait()
 	elapsed := time.Since(start)
@@ -129,6 +141,19 @@ func collectArchiveData(client *fronius.SymoClient, w *sync.WaitGroup) {
 			return
 		}
 		parseArchiveMetrics(archiveData)
+	}
+}
+
+func collectSmartMeterData(client *fronius.SymoClient, w *sync.WaitGroup) {
+	defer w.Done()
+	if client.Options.SmartMeterEnabled {
+		meterData, err := client.GetMeterData()
+		if err != nil {
+			log.WithError(err).Warn("Could not collect Symo SmartMeter metrics.")
+			scrapeErrorCount.Add(1)
+			return
+		}
+		parseSmartMeterMetrics(meterData)
 	}
 }
 
@@ -163,5 +188,13 @@ func parseArchiveMetrics(data map[string]fronius.InverterArchive) {
 		siteMPPTCurrentDCGaugeVec.WithLabelValues(key, "2").Set(inverter.Data.CurrentDCString2.Values["0"])
 		siteMPPTVoltageGaugeVec.WithLabelValues(key, "1").Set(inverter.Data.VoltageDCString1.Values["0"])
 		siteMPPTVoltageGaugeVec.WithLabelValues(key, "2").Set(inverter.Data.VoltageDCString2.Values["0"])
+	}
+}
+
+func parseSmartMeterMetrics(data map[string]fronius.MeterData) {
+	log.WithField("meterData", data).Debug("Parsing data.")
+	for key, meter := range data {
+		meterEnergyRealSumConsumedVec.WithLabelValues(key).Set(meter.EnergyRealSumConsumed + config.Symo.OffsetConsumed)
+		meterEnergyRealSumProducedVec.WithLabelValues(key).Set(meter.EnergyRealSumProduced + config.Symo.OffsetProduced)
 	}
 }

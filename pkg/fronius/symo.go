@@ -13,10 +13,12 @@ const (
 	PowerDataPath = "/solar_api/v1/GetPowerFlowRealtimeData.fcgi"
 	// ArchiveDataPath is the Fronius API URL-path for archive data
 	ArchiveDataPath = "/solar_api/v1/GetArchiveData.cgi?Scope=System&Channel=Voltage_DC_String_1&Channel=Current_DC_String_1&Channel=Voltage_DC_String_2&Channel=Current_DC_String_2&HumanReadable=false"
+	// MeterDataPath is the Fronius API URL-path for Smart Meter real time data
+	MeterDataPath = "/solar_api/v1/GetMeterRealtimeData.cgi"
 )
 
 type (
-	symoPowerFlow struct {
+	SymoPowerFlow struct {
 		Body struct {
 			Data SymoData
 		}
@@ -64,7 +66,7 @@ type (
 	}
 
 	// SymoArchive holds the parsed archive data from Symo API
-	symoArchive struct {
+	SymoArchive struct {
 		Body struct {
 			Data map[string]InverterArchive
 		}
@@ -86,6 +88,19 @@ type (
 		Values map[string]float64
 	}
 
+	SymoMeter struct {
+		Body struct {
+			Data map[string]MeterData
+		}
+	}
+
+	MeterData struct {
+		// "EnergyReal_WAC_Sum_Consumed": 560839.0,
+		// "EnergyReal_WAC_Sum_Produced": 94087.0,
+		EnergyRealSumConsumed float64 `json:"EnergyReal_WAC_Sum_Consumed"`
+		EnergyRealSumProduced float64 `json:"EnergyReal_WAC_Sum_Produced"`
+	}
+
 	// SymoClient is a wrapper for making API requests against a Fronius Symo device.
 	SymoClient struct {
 		request *http.Request
@@ -93,11 +108,14 @@ type (
 	}
 	// ClientOptions holds some parameters for the SymoClient.
 	ClientOptions struct {
-		URL              string
-		Headers          http.Header
-		Timeout          time.Duration
-		PowerFlowEnabled bool
-		ArchiveEnabled   bool
+		URL               string
+		Headers           http.Header
+		Timeout           time.Duration
+		PowerFlowEnabled  bool
+		ArchiveEnabled    bool
+		SmartMeterEnabled bool
+		OffsetConsumed    float64
+		OffsetProduced    float64
 	}
 )
 
@@ -126,7 +144,7 @@ func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
 		return nil, err
 	}
 	defer response.Body.Close()
-	p := symoPowerFlow{}
+	p := SymoPowerFlow{}
 	err = json.NewDecoder(response.Body).Decode(&p)
 	if err != nil {
 		return nil, err
@@ -159,7 +177,33 @@ func (c *SymoClient) GetArchiveData() (map[string]InverterArchive, error) {
 		return nil, err
 	}
 	defer response.Body.Close()
-	p := symoArchive{}
+	p := SymoArchive{}
+	err = json.NewDecoder(response.Body).Decode(&p)
+	if err != nil {
+		return nil, err
+	}
+	return p.Body.Data, nil
+}
+
+func (c *SymoClient) GetMeterData() (map[string]MeterData, error) {
+	u, err := url.Parse(c.Options.URL + MeterDataPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	c.request.URL = u
+	client := http.DefaultClient
+	client.Timeout = c.Options.Timeout
+	response, err := client.Do(c.request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	p := SymoMeter{}
 	err = json.NewDecoder(response.Body).Decode(&p)
 	if err != nil {
 		return nil, err
