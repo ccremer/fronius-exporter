@@ -86,12 +86,12 @@ var (
 	}, []string{"inverter", "mppt"})
 	meterEnergyRealSumConsumedVec = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "meter_energy_consumed_wh",
+		Name:      "meter_energy_consumed_wh_total",
 		Help:      "Meter consumed energy from grid in Wh",
 	}, []string{"device"})
 	meterEnergyRealSumProducedVec = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "meter_energy_produced_wh",
+		Name:      "meter_energy_produced_wh_total",
 		Help:      "Meter produced energy to grid in Wh",
 	}, []string{"device"})
 )
