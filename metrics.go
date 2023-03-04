@@ -53,7 +53,7 @@ var (
 	sitePowerPhotovoltaicsGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Name:      "site_power_photovoltaic",
-		Help:      "Site power from photovoltaic",
+		Help:      "Site power from photovoltaic in Watt",
 	})
 
 	siteAutonomyRatioGauge = promauto.NewGauge(prometheus.GaugeOpts{
