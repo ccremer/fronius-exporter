@@ -39,7 +39,7 @@ func NewDefaultConfig() *Configuration {
 			Headers:           []string{},
 			PowerFlowEnabled:  true,
 			ArchiveEnabled:    true,
-			SmartMeterEnabled: true,
+			SmartMeterEnabled: false,
 			OffsetConsumed:    0.0,
 			OffsetProduced:    0.0,
 		},
