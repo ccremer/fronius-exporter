@@ -88,7 +88,7 @@ type (
 		Values map[string]float64
 	}
 
-	SymoMeter struct {
+	symoMeter struct {
 		Body struct {
 			Data map[string]MeterData
 		}
