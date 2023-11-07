@@ -1,0 +1,61 @@
+{
+  "Body": {
+    "Data": {
+      "0": {
+        "Current_AC_Phase_1": 0.52100000000000002,
+        "Current_AC_Phase_2": 0.52300000000000002,
+        "Current_AC_Phase_3": -0.56999999999999995,
+        "Current_AC_Sum": 0.47400000000000009,
+        "Details": {
+          "Manufacturer": "Fronius",
+          "Model": "Smart Meter TS 65A-3",
+          "Serial": "08154711"
+        },
+        "Enable": 1,
+        "EnergyReactive_VArAC_Sum_Consumed": 1924.0,
+        "EnergyReactive_VArAC_Sum_Produced": 399648.0,
+        "EnergyReal_WAC_Minus_Absolute": 94087.0,
+        "EnergyReal_WAC_Plus_Absolute": 560839.0,
+        "EnergyReal_WAC_Sum_Consumed": 560839.0,
+        "EnergyReal_WAC_Sum_Produced": 94087.0,
+        "Frequency_Phase_Average": 50.0,
+        "Meter_Location_Current": 0.0,
+        "PowerApparent_S_Phase_1": 109.3,
+        "PowerApparent_S_Phase_2": 88.0,
+        "PowerApparent_S_Phase_3": 126.8,
+        "PowerApparent_S_Sum": 324.10000000000002,
+        "PowerFactor_Phase_1": 0.12,
+        "PowerFactor_Phase_2": 0.86499999999999999,
+        "PowerFactor_Phase_3": -0.98299999999999998,
+        "PowerFactor_Sum": -0.19800000000000001,
+        "PowerReactive_Q_Phase_1": -108.5,
+        "PowerReactive_Q_Phase_2": -44.200000000000003,
+        "PowerReactive_Q_Phase_3": -23.100000000000001,
+        "PowerReactive_Q_Sum": -175.80000000000001,
+        "PowerReal_P_Phase_1": 13.1,
+        "PowerReal_P_Phase_2": 76.0,
+        "PowerReal_P_Phase_3": -124.7,
+        "PowerReal_P_Sum": -35.5,
+        "TimeStamp": 1677777249,
+        "Visible": 1,
+        "Voltage_AC_PhaseToPhase_12": 398.69999999999999,
+        "Voltage_AC_PhaseToPhase_23": 401.39999999999998,
+        "Voltage_AC_PhaseToPhase_31": 398.60000000000002,
+        "Voltage_AC_Phase_1": 228.59999999999999,
+        "Voltage_AC_Phase_2": 231.80000000000001,
+        "Voltage_AC_Phase_3": 231.69999999999999
+      }
+    }
+  },
+  "Head": {
+    "RequestArguments": {
+      "Scope": "System"
+    },
+    "Status": {
+      "Code": 0,
+      "Reason": "",
+      "UserMessage": ""
+    },
+    "Timestamp": "2023-03-02T17:14:10+00:00"
+  }
+}

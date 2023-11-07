@@ -58,3 +58,23 @@ func Test_Symo_GetArchiveData_GivenUrl_WhenRequestData_ThenParseStruct(t *testin
 	assert.Equal(t, float64(425.6), p["inverter/1"].Data.VoltageDCString1.Values["0"])
 	assert.Equal(t, float64(408.90000000000003), p["inverter/1"].Data.VoltageDCString2.Values["0"])
 }
+
+func Test_Symo_GetMeterData_GivenUrl_WhenRequestData_ThenParseStruct(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		payload, err := os.ReadFile("testdata/test_meter.json")
+		require.NoError(t, err)
+		_, _ = rw.Write(payload)
+	}))
+
+	c, err := NewSymoClient(ClientOptions{
+		URL:              server.URL,
+		PowerFlowEnabled: true,
+		ArchiveEnabled:   true,
+	})
+	require.NoError(t, err)
+
+	p, err := c.GetMeterData()
+	assert.NoError(t, err)
+	assert.Equal(t, float64(560839), p["0"].EnergyRealSumConsumed)
+	assert.Equal(t, float64(94087), p["0"].EnergyRealSumProduced)
+}

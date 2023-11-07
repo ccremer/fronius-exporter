@@ -30,16 +30,19 @@ func main() {
 	headers := http.Header{}
 	cfg.ConvertHeaders(config.Symo.Headers, &headers)
 	symoClient, err := fronius.NewSymoClient(fronius.ClientOptions{
-		URL:              config.Symo.URL,
-		Headers:          headers,
-		Timeout:          config.Symo.Timeout,
-		PowerFlowEnabled: config.Symo.PowerFlowEnabled,
-		ArchiveEnabled:   config.Symo.ArchiveEnabled,
+		URL:               config.Symo.URL,
+		Headers:           headers,
+		Timeout:           config.Symo.Timeout,
+		PowerFlowEnabled:  config.Symo.PowerFlowEnabled,
+		ArchiveEnabled:    config.Symo.ArchiveEnabled,
+		SmartMeterEnabled: config.Symo.SmartMeterEnabled,
+		OffsetConsumed:    config.Symo.OffsetConsumed,
+		OffsetProduced:    config.Symo.OffsetProduced,
 	})
 	if err != nil {
 		log.WithError(err).Fatal("Cannot initialize Fronius Symo client.")
 	}
-	if !config.Symo.ArchiveEnabled && !config.Symo.PowerFlowEnabled {
+	if !config.Symo.ArchiveEnabled && !config.Symo.PowerFlowEnabled && !config.Symo.SmartMeterEnabled {
 		log.Fatal("All scrape endpoints are disabled. You need enable at least one endpoint.")
 	}
 
