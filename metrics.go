@@ -84,6 +84,47 @@ var (
 		Name:      "site_mppt_current_dc",
 		Help:      "Site mppt current DC in A",
 	}, []string{"inverter", "mppt"})
+
+	siteRealtimeDataIDCGauge1 = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_idc1",
+		Help:      "Site real time data DC current string 1",
+	})
+	siteRealtimeDataIDCGauge2 = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_idc2",
+		Help:      "Site real time data DC current string 2",
+	})
+	siteRealtimeDataIDCGauge3 = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_idc3",
+		Help:      "Site real time data DC current string 3",
+	})
+	siteRealtimeDataIDCGauge4 = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_idc4",
+		Help:      "Site real time data DC current string 4",
+	})
+	siteRealtimeDataUDCGauge1 = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_udc1",
+		Help:      "Site real time data DC voltage string 1",
+	})
+	siteRealtimeDataUDCGauge2 = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_udc2",
+		Help:      "Site real time data DC voltage string 2",
+	})
+	siteRealtimeDataUDCGauge3 = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_udc3",
+		Help:      "Site real time data DC voltage string 3",
+	})
+	siteRealtimeDataUDCGauge4 = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_udc4",
+		Help:      "Site real time data DC voltage string 4",
+	})
 )
 
 func collectMetricsFromTarget(client *fronius.SymoClient) {
@@ -96,10 +137,11 @@ func collectMetricsFromTarget(client *fronius.SymoClient) {
 	}).Debug("Requesting data.")
 
 	wg := sync.WaitGroup{}
-	wg.Add(2)
+	wg.Add(3)
 
 	collectPowerFlowData(client, &wg)
 	collectArchiveData(client, &wg)
+	collectInverterRealtimeData(client, &wg)
 
 	wg.Wait()
 	elapsed := time.Since(start)
@@ -116,6 +158,19 @@ func collectPowerFlowData(client *fronius.SymoClient, w *sync.WaitGroup) {
 			return
 		}
 		parsePowerFlowMetrics(powerFlowData)
+	}
+}
+
+func collectInverterRealtimeData(client *fronius.SymoClient, w *sync.WaitGroup) {
+	defer w.Done()
+	if client.Options.InverterRealtimeEnabled {
+		powerFlowData, err := client.GetInverterRealtimeData()
+		if err != nil {
+			log.WithError(err).Warn("Could not collect Symo inverter realtime metrics.")
+			scrapeErrorCount.Add(1)
+			return
+		}
+		parseInverterRealtimeData(powerFlowData)
 	}
 }
 
@@ -153,6 +208,19 @@ func parsePowerFlowMetrics(data *fronius.SymoData) {
 	} else {
 		siteSelfConsumptionRatioGauge.Set(data.Site.RelativeSelfConsumption / 100)
 	}
+}
+
+func parseInverterRealtimeData(data *fronius.SymoInverterRealtimeData) {
+	log.WithField("InverterRealtimeData", *data).Debug("Parsing data.")
+	siteRealtimeDataIDCGauge1.Set(data.IDC1.Value)
+	siteRealtimeDataIDCGauge2.Set(data.IDC2.Value)
+	siteRealtimeDataIDCGauge3.Set(data.IDC3.Value)
+	siteRealtimeDataIDCGauge4.Set(data.IDC4.Value)
+
+	siteRealtimeDataUDCGauge1.Set(data.UDC1.Value)
+	siteRealtimeDataUDCGauge2.Set(data.UDC2.Value)
+	siteRealtimeDataUDCGauge3.Set(data.UDC3.Value)
+	siteRealtimeDataUDCGauge4.Set(data.UDC4.Value)
 }
 
 func parseArchiveMetrics(data map[string]fronius.InverterArchive) {

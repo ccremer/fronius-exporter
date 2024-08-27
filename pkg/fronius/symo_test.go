@@ -45,9 +45,10 @@ func Test_Symo_GetArchiveData_GivenUrl_WhenRequestData_ThenParseStruct(t *testin
 	}))
 
 	c, err := NewSymoClient(ClientOptions{
-		URL:              server.URL,
-		PowerFlowEnabled: true,
-		ArchiveEnabled:   true,
+		URL:                     server.URL,
+		PowerFlowEnabled:        true,
+		ArchiveEnabled:          true,
+		InverterRealtimeEnabled: true,
 	})
 	require.NoError(t, err)
 

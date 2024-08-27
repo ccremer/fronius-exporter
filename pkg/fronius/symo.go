@@ -13,6 +13,8 @@ const (
 	PowerDataPath = "/solar_api/v1/GetPowerFlowRealtimeData.fcgi"
 	// ArchiveDataPath is the Fronius API URL-path for archive data
 	ArchiveDataPath = "/solar_api/v1/GetArchiveData.cgi?Scope=System&Channel=Voltage_DC_String_1&Channel=Current_DC_String_1&Channel=Voltage_DC_String_2&Channel=Current_DC_String_2&HumanReadable=false"
+	// InverterRealtimeDataPath is the Fronius API URL-path for inverter real time data
+	InverterRealtimeDataPath = "/solar_api/v1/GetInverterRealtimeData.cgi?Scope=Device&DeviceId=1&DataCollection=CommonInverterData"
 )
 
 type (
@@ -63,6 +65,28 @@ type (
 		EnergyTotal float64 `json:"E_Total"`
 	}
 
+	symoInverterRealtime struct {
+		Body struct {
+			Data SymoInverterRealtimeData `json:"Data"`
+		}
+	}
+	SymoInverterRealtimeData struct {
+		IDC1 RealTimeDataPoint `json:"IDC"`
+		IDC2 RealTimeDataPoint `json:"IDC_2"`
+		IDC3 RealTimeDataPoint `json:"IDC_3"`
+		IDC4 RealTimeDataPoint `json:"IDC_4"`
+
+		UDC1 RealTimeDataPoint `json:"UDC"`
+		UDC2 RealTimeDataPoint `json:"UDC_2"`
+		UDC3 RealTimeDataPoint `json:"UDC_3"`
+		UDC4 RealTimeDataPoint `json:"UDC_4"`
+	}
+
+	RealTimeDataPoint struct {
+		Unit  string  `json:"Unit"`
+		Value float64 `json:"Value"`
+	}
+
 	// SymoArchive holds the parsed archive data from Symo API
 	symoArchive struct {
 		Body struct {
@@ -93,11 +117,12 @@ type (
 	}
 	// ClientOptions holds some parameters for the SymoClient.
 	ClientOptions struct {
-		URL              string
-		Headers          http.Header
-		Timeout          time.Duration
-		PowerFlowEnabled bool
-		ArchiveEnabled   bool
+		URL                     string
+		Headers                 http.Header
+		Timeout                 time.Duration
+		PowerFlowEnabled        bool
+		ArchiveEnabled          bool
+		InverterRealtimeEnabled bool
 	}
 )
 
@@ -127,6 +152,29 @@ func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
 	}
 	defer response.Body.Close()
 	p := symoPowerFlow{}
+	err = json.NewDecoder(response.Body).Decode(&p)
+	if err != nil {
+		return nil, err
+	}
+	return &p.Body.Data, nil
+}
+
+// GetPowerFlowData returns the parsed data from the Symo device.
+func (c *SymoClient) GetInverterRealtimeData() (*SymoInverterRealtimeData, error) {
+	u, err := url.Parse(c.Options.URL + InverterRealtimeDataPath)
+	if err != nil {
+		return nil, err
+	}
+
+	c.request.URL = u
+	client := http.DefaultClient
+	client.Timeout = c.Options.Timeout
+	response, err := client.Do(c.request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	p := symoInverterRealtime{}
 	err = json.NewDecoder(response.Body).Decode(&p)
 	if err != nil {
 		return nil, err

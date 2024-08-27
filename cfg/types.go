@@ -16,11 +16,12 @@ type (
 	}
 	// SymoConfig configures the Fronius Symo device
 	SymoConfig struct {
-		URL              string        `koanf:"url"`
-		Timeout          time.Duration `koanf:"timeout"`
-		Headers          []string      `koanf:"header"`
-		PowerFlowEnabled bool          `koanf:"enable-power-flow"`
-		ArchiveEnabled   bool          `koanf:"enable-archive"`
+		URL                     string        `koanf:"url"`
+		Timeout                 time.Duration `koanf:"timeout"`
+		Headers                 []string      `koanf:"header"`
+		PowerFlowEnabled        bool          `koanf:"enable-power-flow"`
+		ArchiveEnabled          bool          `koanf:"enable-archive"`
+		InverterRealtimeEnabled bool          `koanf:"enable-inverter-realtime"`
 	}
 )
 
@@ -31,11 +32,12 @@ func NewDefaultConfig() *Configuration {
 			Level: "info",
 		},
 		Symo: SymoConfig{
-			URL:              "http://symo.ip.or.hostname",
-			Timeout:          5 * time.Second,
-			Headers:          []string{},
-			PowerFlowEnabled: true,
-			ArchiveEnabled:   true,
+			URL:                     "http://symo.ip.or.hostname",
+			Timeout:                 5 * time.Second,
+			Headers:                 []string{},
+			PowerFlowEnabled:        true,
+			ArchiveEnabled:          true,
+			InverterRealtimeEnabled: true,
 		},
 		BindAddr: ":8080",
 	}
