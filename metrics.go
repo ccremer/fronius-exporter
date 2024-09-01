@@ -125,6 +125,21 @@ var (
 		Name:      "site_realtime_data_udc4",
 		Help:      "Site real time data DC voltage string 4",
 	})
+	siteRealtimeDataFACGauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_fac",
+		Help:      "Site real time data AC frequency",
+	})
+	siteRealtimeDataPACGauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_pac",
+		Help:      "Site real time data AC power",
+	})
+	siteRealtimeDataTotalEnergyGauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_total_energy",
+		Help:      "Site real time data total energy",
+	})
 )
 
 func collectMetricsFromTarget(client *fronius.SymoClient) {
@@ -221,6 +236,10 @@ func parseInverterRealtimeData(data *fronius.SymoInverterRealtimeData) {
 	siteRealtimeDataUDCGauge2.Set(data.UDC2.Value)
 	siteRealtimeDataUDCGauge3.Set(data.UDC3.Value)
 	siteRealtimeDataUDCGauge4.Set(data.UDC4.Value)
+
+	siteRealtimeDataFACGauge.Set(data.FAC.Value)
+	siteRealtimeDataPACGauge.Set(data.PAC.Value)
+	siteRealtimeDataTotalEnergyGauge.Set(data.TOTAL_ENERGY.Value)
 }
 
 func parseArchiveMetrics(data map[string]fronius.InverterArchive) {

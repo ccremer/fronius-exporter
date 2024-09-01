@@ -71,15 +71,26 @@ type (
 		}
 	}
 	SymoInverterRealtimeData struct {
+		//currents of strings 1 to 4
 		IDC1 RealTimeDataPoint `json:"IDC"`
 		IDC2 RealTimeDataPoint `json:"IDC_2"`
 		IDC3 RealTimeDataPoint `json:"IDC_3"`
 		IDC4 RealTimeDataPoint `json:"IDC_4"`
 
+		//voltages of strings 1 to 4
 		UDC1 RealTimeDataPoint `json:"UDC"`
 		UDC2 RealTimeDataPoint `json:"UDC_2"`
 		UDC3 RealTimeDataPoint `json:"UDC_3"`
 		UDC4 RealTimeDataPoint `json:"UDC_4"`
+
+		//AC frequency
+		FAC RealTimeDataPoint `json:"FAC"`
+
+		//AC power
+		PAC RealTimeDataPoint `json:"PAC"`
+
+		//total energy
+		TOTAL_ENERGY RealTimeDataPoint `json:"TOTAL_ENERGY"`
 	}
 
 	RealTimeDataPoint struct {
