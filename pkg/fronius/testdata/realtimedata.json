@@ -1,0 +1,88 @@
+{
+   "Body" : {
+      "Data" : {
+         "DAY_ENERGY" : {
+            "Unit" : "Wh",
+            "Value" : null
+         },
+         "DeviceStatus" : {
+            "ErrorCode" : 0,
+            "InverterState" : "Running",
+            "StatusCode" : 7
+         },
+         "FAC" : {
+            "Unit" : "Hz",
+            "Value" : 50.029872894287109
+         },
+         "IAC" : {
+            "Unit" : "A",
+            "Value" : 1.0811097323894501
+         },
+         "IDC" : {
+            "Unit" : "A",
+            "Value" : 0.021116470918059349
+         },
+         "IDC_2" : {
+            "Unit" : "A",
+            "Value" : 0.01560344360768795
+         },
+         "IDC_3" : {
+            "Unit" : "A",
+            "Value" : null
+         },
+         "IDC_4" : {
+            "Unit" : "A",
+            "Value" : null
+         },
+         "PAC" : {
+            "Unit" : "W",
+            "Value" : 253.71487426757812
+         },
+         "SAC" : {
+            "Unit" : "VA",
+            "Value" : 253.71539306640625
+         },
+         "TOTAL_ENERGY" : {
+            "Unit" : "Wh",
+            "Value" : 1392623.8052777778
+         },
+         "UAC" : {
+            "Unit" : "V",
+            "Value" : 232.35920715332031
+         },
+         "UDC" : {
+            "Unit" : "V",
+            "Value" : 44.587142944335938
+         },
+         "UDC_2" : {
+            "Unit" : "V",
+            "Value" : 72.194984436035156
+         },
+         "UDC_3" : {
+            "Unit" : "V",
+            "Value" : null
+         },
+         "UDC_4" : {
+            "Unit" : "V",
+            "Value" : null
+         },
+         "YEAR_ENERGY" : {
+            "Unit" : "Wh",
+            "Value" : null
+         }
+      }
+   },
+   "Head" : {
+      "RequestArguments" : {
+         "DataCollection" : "CommonInverterData",
+         "DeviceId" : "1",
+         "Scope" : "Device"
+      },
+      "Status" : {
+         "Code" : 0,
+         "Reason" : "",
+         "UserMessage" : ""
+      },
+      "Timestamp" : "2024-09-05T18:37:52+00:00"
+   }
+}
