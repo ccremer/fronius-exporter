@@ -85,60 +85,60 @@ var (
 		Help:      "Site mppt current DC in A",
 	}, []string{"inverter", "mppt"})
 
-	siteRealtimeDataIDCGauge1 = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataDcCurrentMPPT1Gauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_idc1",
-		Help:      "Site real time data DC current string 1",
+		Name:      "site_realtime_data_dc_current_mppt1",
+		Help:      "Site real time data DC current MPPT 1 in A",
 	})
-	siteRealtimeDataIDCGauge2 = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataDcCurrentMPPT2Gauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_idc2",
-		Help:      "Site real time data DC current string 2",
+		Name:      "site_realtime_data_dc_current_mppt2",
+		Help:      "Site real time data DC current MPPT 2 in A",
 	})
-	siteRealtimeDataIDCGauge3 = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataDcCurrentMPPT3Gauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_idc3",
-		Help:      "Site real time data DC current string 3",
+		Name:      "site_realtime_data_dc_current_mppt3",
+		Help:      "Site real time data DC current MPPT 3 in A",
 	})
-	siteRealtimeDataIDCGauge4 = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataDcCurrentMPPT4Gauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_idc4",
-		Help:      "Site real time data DC current string 4",
+		Name:      "site_realtime_data_dc_current_mppt4",
+		Help:      "Site real time data DC current MPPT 4 in A",
 	})
-	siteRealtimeDataUDCGauge1 = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataDcVoltageMPPT1Gauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_udc1",
-		Help:      "Site real time data DC voltage string 1",
+		Name:      "site_realtime_data_dc_voltage_mppt1",
+		Help:      "Site real time data DC voltage MPPT 1 in V",
 	})
-	siteRealtimeDataUDCGauge2 = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataDcVoltageMPPT2Gauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_udc2",
-		Help:      "Site real time data DC voltage string 2",
+		Name:      "site_realtime_data_dc_voltage_mppt2",
+		Help:      "Site real time data DC voltage MPPT 2 in V",
 	})
-	siteRealtimeDataUDCGauge3 = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataDcVoltageMPPT3Gauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_udc3",
-		Help:      "Site real time data DC voltage string 3",
+		Name:      "site_realtime_data_dc_voltage_mppt3",
+		Help:      "Site real time data DC voltage MPPT 3 in V",
 	})
-	siteRealtimeDataUDCGauge4 = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataDcVoltageMPPT4Gauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_udc4",
-		Help:      "Site real time data DC voltage string 4",
+		Name:      "site_realtime_data_dc_voltage_mppt4",
+		Help:      "Site real time data DC voltage MPPT 4 in V",
 	})
-	siteRealtimeDataFACGauge = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataAcFrequencyGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_fac",
-		Help:      "Site real time data AC frequency",
+		Name:      "site_realtime_data_ac_frequency",
+		Help:      "Site real time data AC frequency in Hz",
 	})
-	siteRealtimeDataPACGauge = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataAcPowerGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_pac",
-		Help:      "Site real time data AC power",
+		Name:      "site_realtime_data_ac_power",
+		Help:      "Site real time data AC power in W",
 	})
-	siteRealtimeDataTotalEnergyGauge = promauto.NewGauge(prometheus.GaugeOpts{
+	siteRealtimeDataTotalEnergyGeneratedGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "site_realtime_data_total_energy",
-		Help:      "Site real time data total energy",
+		Name:      "site_realtime_data_total_energy_generated",
+		Help:      "Site real time data total energy generated in Wh",
 	})
 )
 
@@ -227,19 +227,19 @@ func parsePowerFlowMetrics(data *fronius.SymoData) {
 
 func parseInverterRealtimeData(data *fronius.SymoInverterRealtimeData) {
 	log.WithField("InverterRealtimeData", *data).Debug("Parsing data.")
-	siteRealtimeDataIDCGauge1.Set(data.IDC1.Value)
-	siteRealtimeDataIDCGauge2.Set(data.IDC2.Value)
-	siteRealtimeDataIDCGauge3.Set(data.IDC3.Value)
-	siteRealtimeDataIDCGauge4.Set(data.IDC4.Value)
+	siteRealtimeDataDcCurrentMPPT1Gauge.Set(data.DcCurrentMPPT1.Value)
+	siteRealtimeDataDcCurrentMPPT2Gauge.Set(data.DcCurrentMPPT2.Value)
+	siteRealtimeDataDcCurrentMPPT3Gauge.Set(data.DcCurrentMPPT3.Value)
+	siteRealtimeDataDcCurrentMPPT4Gauge.Set(data.DcCurrentMPPT4.Value)
 
-	siteRealtimeDataUDCGauge1.Set(data.UDC1.Value)
-	siteRealtimeDataUDCGauge2.Set(data.UDC2.Value)
-	siteRealtimeDataUDCGauge3.Set(data.UDC3.Value)
-	siteRealtimeDataUDCGauge4.Set(data.UDC4.Value)
+	siteRealtimeDataDcVoltageMPPT1Gauge.Set(data.DcVoltageMPPT1.Value)
+	siteRealtimeDataDcVoltageMPPT2Gauge.Set(data.DcVoltageMPPT2.Value)
+	siteRealtimeDataDcVoltageMPPT3Gauge.Set(data.DcVoltageMPPT3.Value)
+	siteRealtimeDataDcVoltageMPPT4Gauge.Set(data.DcVoltageMPPT4.Value)
 
-	siteRealtimeDataFACGauge.Set(data.FAC.Value)
-	siteRealtimeDataPACGauge.Set(data.PAC.Value)
-	siteRealtimeDataTotalEnergyGauge.Set(data.TOTAL_ENERGY.Value)
+	siteRealtimeDataAcFrequencyGauge.Set(data.AcFrequency.Value)
+	siteRealtimeDataAcPowerGauge.Set(data.AcPower.Value)
+	siteRealtimeDataTotalEnergyGeneratedGauge.Set(data.TotalEnergyGenerated.Value)
 }
 
 func parseArchiveMetrics(data map[string]fronius.InverterArchive) {
