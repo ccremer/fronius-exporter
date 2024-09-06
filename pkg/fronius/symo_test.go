@@ -45,9 +45,10 @@ func Test_Symo_GetArchiveData_GivenUrl_WhenRequestData_ThenParseStruct(t *testin
 	}))
 
 	c, err := NewSymoClient(ClientOptions{
-		URL:              server.URL,
-		PowerFlowEnabled: true,
-		ArchiveEnabled:   true,
+		URL:                     server.URL,
+		PowerFlowEnabled:        true,
+		ArchiveEnabled:          true,
+		InverterRealtimeEnabled: true,
 	})
 	require.NoError(t, err)
 
@@ -57,4 +58,52 @@ func Test_Symo_GetArchiveData_GivenUrl_WhenRequestData_ThenParseStruct(t *testin
 	assert.Equal(t, float64(15.92), p["inverter/1"].Data.CurrentDCString2.Values["0"])
 	assert.Equal(t, float64(425.6), p["inverter/1"].Data.VoltageDCString1.Values["0"])
 	assert.Equal(t, float64(408.90000000000003), p["inverter/1"].Data.VoltageDCString2.Values["0"])
+}
+
+func Test_Symo_GetInverterRealtimeData_GivenUrl_WhenRequestData_ThenParseStruct(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		payload, err := os.ReadFile("testdata/realtimedata.json")
+		require.NoError(t, err)
+		_, _ = rw.Write(payload)
+	}))
+
+	c, err := NewSymoClient(ClientOptions{
+		URL:                     server.URL,
+		PowerFlowEnabled:        true,
+		ArchiveEnabled:          true,
+		InverterRealtimeEnabled: true,
+	})
+	require.NoError(t, err)
+
+	p, err := c.GetInverterRealtimeData()
+	assert.NoError(t, err)
+
+	//current
+	assert.Equal(t, float64(0.021116470918059349), p.DcCurrentMPPT1.Value)
+	assert.Equal(t, float64(0.01560344360768795), p.DcCurrentMPPT2.Value)
+	assert.Equal(t, float64(0), p.DcCurrentMPPT3.Value)
+	assert.Equal(t, float64(0), p.DcCurrentMPPT4.Value)
+	assert.Equal(t, "A", p.DcCurrentMPPT1.Unit)
+	assert.Equal(t, "A", p.DcCurrentMPPT2.Unit)
+	assert.Equal(t, "A", p.DcCurrentMPPT3.Unit)
+	assert.Equal(t, "A", p.DcCurrentMPPT4.Unit)
+
+	//voltage
+	assert.Equal(t, float64(44.587142944335938), p.DcVoltageMPPT1.Value)
+	assert.Equal(t, float64(72.194984436035156), p.DcVoltageMPPT2.Value)
+	assert.Equal(t, float64(0), p.DcVoltageMPPT3.Value)
+	assert.Equal(t, float64(0), p.DcVoltageMPPT4.Value)
+	assert.Equal(t, "V", p.DcVoltageMPPT1.Unit)
+	assert.Equal(t, "V", p.DcVoltageMPPT2.Unit)
+	assert.Equal(t, "V", p.DcVoltageMPPT3.Unit)
+	assert.Equal(t, "V", p.DcVoltageMPPT4.Unit)
+
+	//AC frequency
+	assert.Equal(t, float64(50.029872894287109), p.AcFrequency.Value)
+
+	//AC power
+	assert.Equal(t, float64(253.71487426757812), p.AcPower.Value)
+
+	//Total energy generated
+	assert.Equal(t, float64(1392623.8052777778), p.TotalEnergyGenerated.Value)
 }

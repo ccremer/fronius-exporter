@@ -84,6 +84,62 @@ var (
 		Name:      "site_mppt_current_dc",
 		Help:      "Site mppt current DC in A",
 	}, []string{"inverter", "mppt"})
+
+	siteRealtimeDataDcCurrentMPPT1Gauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_dc_current_mppt1",
+		Help:      "Site real time data DC current MPPT 1 in A",
+	})
+	siteRealtimeDataDcCurrentMPPT2Gauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_dc_current_mppt2",
+		Help:      "Site real time data DC current MPPT 2 in A",
+	})
+	siteRealtimeDataDcCurrentMPPT3Gauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_dc_current_mppt3",
+		Help:      "Site real time data DC current MPPT 3 in A",
+	})
+	siteRealtimeDataDcCurrentMPPT4Gauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_dc_current_mppt4",
+		Help:      "Site real time data DC current MPPT 4 in A",
+	})
+	siteRealtimeDataDcVoltageMPPT1Gauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_dc_voltage_mppt1",
+		Help:      "Site real time data DC voltage MPPT 1 in V",
+	})
+	siteRealtimeDataDcVoltageMPPT2Gauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_dc_voltage_mppt2",
+		Help:      "Site real time data DC voltage MPPT 2 in V",
+	})
+	siteRealtimeDataDcVoltageMPPT3Gauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_dc_voltage_mppt3",
+		Help:      "Site real time data DC voltage MPPT 3 in V",
+	})
+	siteRealtimeDataDcVoltageMPPT4Gauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_dc_voltage_mppt4",
+		Help:      "Site real time data DC voltage MPPT 4 in V",
+	})
+	siteRealtimeDataAcFrequencyGauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_ac_frequency",
+		Help:      "Site real time data AC frequency in Hz",
+	})
+	siteRealtimeDataAcPowerGauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_ac_power",
+		Help:      "Site real time data AC power in W",
+	})
+	siteRealtimeDataTotalEnergyGeneratedGauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_realtime_data_total_energy_generated",
+		Help:      "Site real time data total energy generated in Wh",
+	})
 )
 
 func collectMetricsFromTarget(client *fronius.SymoClient) {
@@ -96,10 +152,11 @@ func collectMetricsFromTarget(client *fronius.SymoClient) {
 	}).Debug("Requesting data.")
 
 	wg := sync.WaitGroup{}
-	wg.Add(2)
+	wg.Add(3)
 
 	collectPowerFlowData(client, &wg)
 	collectArchiveData(client, &wg)
+	collectInverterRealtimeData(client, &wg)
 
 	wg.Wait()
 	elapsed := time.Since(start)
@@ -116,6 +173,19 @@ func collectPowerFlowData(client *fronius.SymoClient, w *sync.WaitGroup) {
 			return
 		}
 		parsePowerFlowMetrics(powerFlowData)
+	}
+}
+
+func collectInverterRealtimeData(client *fronius.SymoClient, w *sync.WaitGroup) {
+	defer w.Done()
+	if client.Options.InverterRealtimeEnabled {
+		powerFlowData, err := client.GetInverterRealtimeData()
+		if err != nil {
+			log.WithError(err).Warn("Could not collect Symo inverter realtime metrics.")
+			scrapeErrorCount.Add(1)
+			return
+		}
+		parseInverterRealtimeData(powerFlowData)
 	}
 }
 
@@ -153,6 +223,23 @@ func parsePowerFlowMetrics(data *fronius.SymoData) {
 	} else {
 		siteSelfConsumptionRatioGauge.Set(data.Site.RelativeSelfConsumption / 100)
 	}
+}
+
+func parseInverterRealtimeData(data *fronius.SymoInverterRealtimeData) {
+	log.WithField("InverterRealtimeData", *data).Debug("Parsing data.")
+	siteRealtimeDataDcCurrentMPPT1Gauge.Set(data.DcCurrentMPPT1.Value)
+	siteRealtimeDataDcCurrentMPPT2Gauge.Set(data.DcCurrentMPPT2.Value)
+	siteRealtimeDataDcCurrentMPPT3Gauge.Set(data.DcCurrentMPPT3.Value)
+	siteRealtimeDataDcCurrentMPPT4Gauge.Set(data.DcCurrentMPPT4.Value)
+
+	siteRealtimeDataDcVoltageMPPT1Gauge.Set(data.DcVoltageMPPT1.Value)
+	siteRealtimeDataDcVoltageMPPT2Gauge.Set(data.DcVoltageMPPT2.Value)
+	siteRealtimeDataDcVoltageMPPT3Gauge.Set(data.DcVoltageMPPT3.Value)
+	siteRealtimeDataDcVoltageMPPT4Gauge.Set(data.DcVoltageMPPT4.Value)
+
+	siteRealtimeDataAcFrequencyGauge.Set(data.AcFrequency.Value)
+	siteRealtimeDataAcPowerGauge.Set(data.AcPower.Value)
+	siteRealtimeDataTotalEnergyGeneratedGauge.Set(data.TotalEnergyGenerated.Value)
 }
 
 func parseArchiveMetrics(data map[string]fronius.InverterArchive) {
