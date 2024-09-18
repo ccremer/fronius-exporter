@@ -2,12 +2,12 @@ package cfg
 
 import (
 	"fmt"
+	"github.com/knadh/koanf/v2"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/posflag"
 	log "github.com/sirupsen/logrus"
