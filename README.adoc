@@ -13,8 +13,6 @@ endif::[]
 
 ifdef::status[]
 image:https://img.shields.io/github/workflow/status/ccremer/fronius-exporter/Build/master[Build,link=https://github.com/ccremer/fronius-exporter/actions?query=workflow%3ABuild]
-image:https://img.shields.io/codeclimate/maintainability/ccremer/fronius-exporter[Maintainability,link=https://codeclimate.com/github/ccremer/fronius-exporter]
-image:https://img.shields.io/codeclimate/coverage/ccremer/fronius-exporter[Tests,link=https://codeclimate.com/github/ccremer/fronius-exporter]
 image:https://img.shields.io/github/v/release/ccremer/fronius-exporter[Releases,link=https://github.com/ccremer/fronius-exporter/releases]
 image:https://img.shields.io/github/license/ccremer/fronius-exporter[License,link=https://github.com/ccremer/fronius-exporter/blob/master/LICENSE]
 endif::[]
@@ -106,7 +104,7 @@ Platform related builds are handled by `goreleaser`:
 export GOOS=linux
 export GOARCH=arm64
 export IMAGE_REPOSITORY=ccremer/fronius-exporter
-goreleaser build --snapshot --rm-dist --single-target
+goreleaser build --snapshot --clean --single-target
 ----
 
 On the other hand you can also use the actual `make build` in combination with `docker buildx`
