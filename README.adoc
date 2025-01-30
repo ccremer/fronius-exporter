@@ -9,10 +9,13 @@ ifdef::env-github[]
 :ext-relative: {outfilesuffix}
 endif::[]
 
+= Looking for maintainer
+
+See https://github.com/ccremer/fronius-exporter/issues/134
+
 = Fronius Exporter
 
 ifdef::status[]
-image:https://img.shields.io/github/workflow/status/ccremer/fronius-exporter/Build/master[Build,link=https://github.com/ccremer/fronius-exporter/actions?query=workflow%3ABuild]
 image:https://img.shields.io/github/v/release/ccremer/fronius-exporter[Releases,link=https://github.com/ccremer/fronius-exporter/releases]
 image:https://img.shields.io/github/license/ccremer/fronius-exporter[License,link=https://github.com/ccremer/fronius-exporter/blob/master/LICENSE]
 endif::[]
