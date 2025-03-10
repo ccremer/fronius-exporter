@@ -165,7 +165,7 @@ func setEnv(m map[string]string) {
 }
 
 func unsetEnv(m map[string]string) {
-	for key, _ := range m {
+	for key := range m {
 		os.Unsetenv(key)
 	}
 }
