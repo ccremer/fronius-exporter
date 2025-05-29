@@ -2,11 +2,12 @@ package cfg
 
 import (
 	"fmt"
-	"github.com/knadh/koanf/v2"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/knadh/koanf/v2"
 
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/posflag"
@@ -44,6 +45,7 @@ func setupCliFlags(version string, fs *flag.FlagSet, config *Configuration) {
 	fs.Bool("symo.enable-power-flow", config.Symo.PowerFlowEnabled, "Enable/disable scraping of power flow data")
 	fs.Bool("symo.enable-archive", config.Symo.ArchiveEnabled, "Enable/disable scraping of archive data")
 	fs.Bool("symo.enable-inverter-realtime", config.Symo.InverterRealtimeEnabled, "Enable/disable scraping of inverter real time data")
+	fs.Bool("symo.enable-meter-realtime", config.Symo.MeterRealtimeEnabled, "Enable/disable scraping of meter real time data")
 }
 
 func postLoadProcess(config *Configuration) {

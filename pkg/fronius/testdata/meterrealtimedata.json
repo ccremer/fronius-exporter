@@ -1,0 +1,10 @@
+{
+  "Body": {
+    "Data": {
+      "0": {
+        "EnergyReal_WAC_Sum_Produced": 12345.67,
+        "EnergyReal_WAC_Sum_Consumed": 7654.32
+      }
+    }
+  }
+}

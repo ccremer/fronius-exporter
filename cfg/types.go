@@ -22,6 +22,7 @@ type (
 		PowerFlowEnabled        bool          `koanf:"enable-power-flow"`
 		ArchiveEnabled          bool          `koanf:"enable-archive"`
 		InverterRealtimeEnabled bool          `koanf:"enable-inverter-realtime"`
+		MeterRealtimeEnabled    bool          `koanf:"enable-meter-realtime"`
 	}
 )
 
@@ -38,6 +39,7 @@ func NewDefaultConfig() *Configuration {
 			PowerFlowEnabled:        true,
 			ArchiveEnabled:          true,
 			InverterRealtimeEnabled: true,
+			MeterRealtimeEnabled:    true,
 		},
 		BindAddr: ":8080",
 	}

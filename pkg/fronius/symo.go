@@ -15,6 +15,8 @@ const (
 	ArchiveDataPath = "/solar_api/v1/GetArchiveData.cgi?Scope=System&Channel=Voltage_DC_String_1&Channel=Current_DC_String_1&Channel=Voltage_DC_String_2&Channel=Current_DC_String_2&HumanReadable=false"
 	// InverterRealtimeDataPath is the Fronius API URL-path for inverter real time data
 	InverterRealtimeDataPath = "/solar_api/v1/GetInverterRealtimeData.cgi?Scope=Device&DeviceId=1&DataCollection=CommonInverterData"
+	// get the current meter data
+	MeterRealtimeDataPath = "/solar_api/v1/GetMeterRealtimeData.cgi"
 )
 
 type (
@@ -98,6 +100,17 @@ type (
 		Value float64 `json:"Value"`
 	}
 
+	symoMeter struct {
+		Body struct {
+			Data map[string]SymoMeterRealtimeData `json:"Data"`
+		}
+	}
+
+	SymoMeterRealtimeData struct {
+		EnergyReal_WAC_Sum_Produced float64 `json:"EnergyReal_WAC_Sum_Produced"`
+		EnergyReal_WAC_Sum_Consumed float64 `json:"EnergyReal_WAC_Sum_Consumed"`
+	}
+
 	// SymoArchive holds the parsed archive data from Symo API
 	symoArchive struct {
 		Body struct {
@@ -134,6 +147,7 @@ type (
 		PowerFlowEnabled        bool
 		ArchiveEnabled          bool
 		InverterRealtimeEnabled bool
+		MeterRealtimeEnabled    bool
 	}
 )
 
@@ -170,7 +184,7 @@ func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
 	return &p.Body.Data, nil
 }
 
-// GetPowerFlowData returns the parsed data from the Symo device.
+// GetInverterRealtimeData returns the parsed data from the Symo device.
 func (c *SymoClient) GetInverterRealtimeData() (*SymoInverterRealtimeData, error) {
 	u, err := url.Parse(c.Options.URL + InverterRealtimeDataPath)
 	if err != nil {
@@ -191,6 +205,30 @@ func (c *SymoClient) GetInverterRealtimeData() (*SymoInverterRealtimeData, error
 		return nil, err
 	}
 	return &p.Body.Data, nil
+}
+
+// GetMeterRealtimeData returns the parsed data from the Symo device.
+func (c *SymoClient) GetMeterRealtimeData() (*SymoMeterRealtimeData, error) {
+	u, err := url.Parse(c.Options.URL + MeterRealtimeDataPath)
+	if err != nil {
+		return nil, err
+	}
+
+	c.request.URL = u
+	client := http.DefaultClient
+	client.Timeout = c.Options.Timeout
+	response, err := client.Do(c.request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	p := symoMeter{}
+	err = json.NewDecoder(response.Body).Decode(&p)
+	if err != nil {
+		return nil, err
+	}
+	data := p.Body.Data["0"]
+	return &data, nil
 }
 
 // GetArchiveData returns the parsed data from the Symo device.
