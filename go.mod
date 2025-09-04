@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/knadh/koanf/providers/env v1.1.0
-	github.com/knadh/koanf/providers/posflag v0.1.0
+	github.com/knadh/koanf/providers/posflag v1.0.1
 	github.com/knadh/koanf/v2 v2.1.2
 	github.com/prometheus/client_golang v1.21.1
 	github.com/sirupsen/logrus v1.9.3
