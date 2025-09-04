@@ -140,6 +140,16 @@ var (
 		Name:      "site_realtime_data_total_energy_generated",
 		Help:      "Site real time data total energy generated in Wh",
 	})
+	siteMeterRealTimeDataEnergyReal_WAC_Sum_Produced = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_meter_real_time_data_energy_real_wac_sum_produced",
+		Help:      "Site meter real time data energy real WAC sum produced in Wh",
+	})
+	siteMeterRealTimeDataEnergyReal_WAC_Sum_Consumed = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "site_meter_real_time_data_energy_real_wac_sum_consumed",
+		Help:      "Site meter real time data energy real WAC sum consumed in Wh",
+	})
 )
 
 func collectMetricsFromTarget(client *fronius.SymoClient) {
@@ -149,14 +159,17 @@ func collectMetricsFromTarget(client *fronius.SymoClient) {
 		"timeout":          client.Options.Timeout,
 		"powerFlowEnabled": client.Options.PowerFlowEnabled,
 		"archiveEnabled":   client.Options.ArchiveEnabled,
+		"inverterRealtime": client.Options.InverterRealtimeEnabled,
+		"meterRealtime":    client.Options.MeterRealtimeEnabled,
 	}).Debug("Requesting data.")
 
 	wg := sync.WaitGroup{}
-	wg.Add(3)
+	wg.Add(4)
 
 	collectPowerFlowData(client, &wg)
 	collectArchiveData(client, &wg)
 	collectInverterRealtimeData(client, &wg)
+	collectMeterRealtimeData(client, &wg)
 
 	wg.Wait()
 	elapsed := time.Since(start)
@@ -186,6 +199,19 @@ func collectInverterRealtimeData(client *fronius.SymoClient, w *sync.WaitGroup) 
 			return
 		}
 		parseInverterRealtimeData(powerFlowData)
+	}
+}
+
+func collectMeterRealtimeData(client *fronius.SymoClient, w *sync.WaitGroup) {
+	defer w.Done()
+	if client.Options.MeterRealtimeEnabled {
+		meterData, err := client.GetMeterRealtimeData()
+		if err != nil {
+			log.WithError(err).Warn("Could not collect Symo meter realtime metrics.")
+			scrapeErrorCount.Add(1)
+			return
+		}
+		parseMeterRealtimeData(meterData)
 	}
 }
 
@@ -240,6 +266,12 @@ func parseInverterRealtimeData(data *fronius.SymoInverterRealtimeData) {
 	siteRealtimeDataAcFrequencyGauge.Set(data.AcFrequency.Value)
 	siteRealtimeDataAcPowerGauge.Set(data.AcPower.Value)
 	siteRealtimeDataTotalEnergyGeneratedGauge.Set(data.TotalEnergyGenerated.Value)
+}
+
+func parseMeterRealtimeData(data *fronius.SymoMeterRealtimeData) {
+	log.WithField("MeterRealtimeData", *data).Debug("Parsing data.")
+	siteMeterRealTimeDataEnergyReal_WAC_Sum_Consumed.Set(data.EnergyReal_WAC_Sum_Consumed)
+	siteMeterRealTimeDataEnergyReal_WAC_Sum_Produced.Set(data.EnergyReal_WAC_Sum_Produced)
 }
 
 func parseArchiveMetrics(data map[string]fronius.InverterArchive) {
