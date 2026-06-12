@@ -147,6 +147,87 @@ func TestParseConfig(t *testing.T) {
 				assert.Equal(t, 3*time.Second, c.Symo.Timeout)
 			},
 		},
+		"GivenMQTTFlags_WhenSpecified_ThenOverrideDefaults": {
+			args: []string{"--mqtt.broker", "tcp://broker:1883", "--mqtt.username", "user", "--mqtt.password", "secret", "--mqtt.base-topic", "/plant/status/", "--mqtt.client-id", "client-1", "--mqtt.queue-size", "32", "--mqtt.reconnect-interval", "9", "--mqtt.availability-topic", "/plant/status/availability/", "--mqtt.availability-payload-up", "up", "--mqtt.availability-payload-down", "down", "--mqtt.discovery-enabled", "--mqtt.discovery-prefix", "/ha/", "--mqtt.discovery-device-name", "Solar", "--mqtt.discovery-device-id", "solar-1", "--mqtt.tls-ca-file", "/tmp/ca.pem", "--mqtt.tls-cert-file", "/tmp/cert.pem", "--mqtt.tls-key-file", "/tmp/key.pem", "--mqtt.tls-server-name", "broker.local", "--mqtt.tls-insecure-skip-verify"},
+			verify: func(c *Configuration) {
+				assert.Equal(t, "tcp://broker:1883", c.MQTT.Broker)
+				assert.Equal(t, "user", c.MQTT.Username)
+				assert.Equal(t, "secret", c.MQTT.Password)
+				assert.Equal(t, "plant/status", c.MQTT.BaseTopic)
+				assert.Equal(t, "client-1", c.MQTT.ClientID)
+				assert.Equal(t, 32, c.MQTT.QueueSize)
+				assert.Equal(t, 9*time.Second, c.MQTT.ReconnectInterval)
+				assert.Equal(t, "plant/status/availability", c.MQTT.AvailabilityTopic)
+				assert.Equal(t, "up", c.MQTT.AvailabilityPayloadUp)
+				assert.Equal(t, "down", c.MQTT.AvailabilityPayloadDown)
+				assert.Equal(t, true, c.MQTT.DiscoveryEnabled)
+				assert.Equal(t, "ha", c.MQTT.DiscoveryPrefix)
+				assert.Equal(t, "Solar", c.MQTT.DiscoveryDeviceName)
+				assert.Equal(t, "solar-1", c.MQTT.DiscoveryDeviceID)
+				assert.Equal(t, "/tmp/ca.pem", c.MQTT.TLSCAFile)
+				assert.Equal(t, "/tmp/cert.pem", c.MQTT.TLSCertFile)
+				assert.Equal(t, "/tmp/key.pem", c.MQTT.TLSKeyFile)
+				assert.Equal(t, "broker.local", c.MQTT.TLSServerName)
+				assert.Equal(t, true, c.MQTT.TLSInsecureSkipVerify)
+			},
+		},
+		"GivenMQTTEnv_WhenSpecified_ThenParse": {
+			envs: map[string]string{
+				"MQTT__BROKER":                    "ssl://broker:8883",
+				"MQTT__USERNAME":                  "user",
+				"MQTT__PASSWORD":                  "secret",
+				"MQTT__BASE_TOPIC":                "fronius/site",
+				"MQTT__CLIENT_ID":                 "client-1",
+				"MQTT__QUEUE_SIZE":                "32",
+				"MQTT__RECONNECT_INTERVAL":        "9",
+				"MQTT__AVAILABILITY_TOPIC":        "fronius/site/status",
+				"MQTT__AVAILABILITY_PAYLOAD_UP":   "up",
+				"MQTT__AVAILABILITY_PAYLOAD_DOWN": "down",
+				"MQTT__DISCOVERY_ENABLED":         "true",
+				"MQTT__DISCOVERY_PREFIX":          "homeassistant",
+				"MQTT__DISCOVERY_DEVICE_NAME":     "Solar",
+				"MQTT__DISCOVERY_DEVICE_ID":       "solar-1",
+				"MQTT__TLS_CA_FILE":               "/tmp/ca.pem",
+				"MQTT__TLS_CERT_FILE":             "/tmp/cert.pem",
+				"MQTT__TLS_KEY_FILE":              "/tmp/key.pem",
+				"MQTT__TLS_SERVER_NAME":           "broker.local",
+				"MQTT__TLS_INSECURE_SKIP_VERIFY":  "true",
+			},
+			verify: func(c *Configuration) {
+				assert.Equal(t, "ssl://broker:8883", c.MQTT.Broker)
+				assert.Equal(t, "user", c.MQTT.Username)
+				assert.Equal(t, "secret", c.MQTT.Password)
+				assert.Equal(t, "fronius/site", c.MQTT.BaseTopic)
+				assert.Equal(t, "client-1", c.MQTT.ClientID)
+				assert.Equal(t, 32, c.MQTT.QueueSize)
+				assert.Equal(t, 9*time.Second, c.MQTT.ReconnectInterval)
+				assert.Equal(t, "fronius/site/status", c.MQTT.AvailabilityTopic)
+				assert.Equal(t, "up", c.MQTT.AvailabilityPayloadUp)
+				assert.Equal(t, "down", c.MQTT.AvailabilityPayloadDown)
+				assert.Equal(t, true, c.MQTT.DiscoveryEnabled)
+				assert.Equal(t, "homeassistant", c.MQTT.DiscoveryPrefix)
+				assert.Equal(t, "Solar", c.MQTT.DiscoveryDeviceName)
+				assert.Equal(t, "solar-1", c.MQTT.DiscoveryDeviceID)
+				assert.Equal(t, "/tmp/ca.pem", c.MQTT.TLSCAFile)
+				assert.Equal(t, "/tmp/cert.pem", c.MQTT.TLSCertFile)
+				assert.Equal(t, "/tmp/key.pem", c.MQTT.TLSKeyFile)
+				assert.Equal(t, "broker.local", c.MQTT.TLSServerName)
+				assert.Equal(t, true, c.MQTT.TLSInsecureSkipVerify)
+			},
+		},
+		"GivenMQTTBrokerUnset_ThenKeepDefaultBaseTopic": {
+			verify: func(c *Configuration) {
+				assert.Equal(t, "fronius-exporter", c.MQTT.BaseTopic)
+				assert.Equal(t, "fronius-exporter/availability", c.MQTT.AvailabilityTopic)
+			},
+		},
+		"GivenPollFlags_WhenSpecified_ThenOverrideDefaults": {
+			args: []string{"--poll.interval", "15", "--poll.fresh-timeout", "45"},
+			verify: func(c *Configuration) {
+				assert.Equal(t, 15*time.Second, c.Poll.Interval)
+				assert.Equal(t, 45*time.Second, c.Poll.FreshTimeout)
+			},
+		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {

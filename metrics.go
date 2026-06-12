@@ -152,7 +152,18 @@ var (
 	})
 )
 
-func collectMetricsFromTarget(client *fronius.SymoClient) {
+func startPollingLoop(client *fronius.SymoClient, state *exporterState, interval time.Duration) {
+	pollTarget(client, state)
+
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		pollTarget(client, state)
+	}
+}
+
+func pollTarget(client *fronius.SymoClient, state *exporterState) {
 	start := time.Now()
 	log.WithFields(log.Fields{
 		"url":              client.Options.URL,
@@ -166,66 +177,93 @@ func collectMetricsFromTarget(client *fronius.SymoClient) {
 	wg := sync.WaitGroup{}
 	wg.Add(4)
 
-	collectPowerFlowData(client, &wg)
-	collectArchiveData(client, &wg)
-	collectInverterRealtimeData(client, &wg)
-	collectMeterRealtimeData(client, &wg)
+	pollPowerFlowData(client, state, &wg)
+	pollArchiveData(client, state, &wg)
+	pollInverterRealtimeData(client, state, &wg)
+	pollMeterRealtimeData(client, state, &wg)
 
 	wg.Wait()
-	elapsed := time.Since(start)
-	scrapeDurationGauge.Set(elapsed.Seconds())
+	scrapeDurationGauge.Set(time.Since(start).Seconds())
 }
 
-func collectPowerFlowData(client *fronius.SymoClient, w *sync.WaitGroup) {
+func pollPowerFlowData(client *fronius.SymoClient, state *exporterState, w *sync.WaitGroup) {
 	defer w.Done()
-	if client.Options.PowerFlowEnabled {
-		powerFlowData, err := client.GetPowerFlowData()
-		if err != nil {
-			log.WithError(err).Warn("Could not collect Symo power metrics.")
-			scrapeErrorCount.Add(1)
-			return
-		}
-		parsePowerFlowMetrics(powerFlowData)
+	if !client.Options.PowerFlowEnabled {
+		return
 	}
+
+	powerFlowData, err := client.GetPowerFlowData()
+	if err != nil {
+		log.WithError(err).Warn("Could not collect Symo power metrics.")
+		scrapeErrorCount.Add(1)
+		state.MarkPollingError(time.Now())
+		return
+	}
+
+	updatedAt := time.Now()
+	parsePowerFlowMetrics(powerFlowData)
+	state.SetPowerFlow(powerFlowData, updatedAt)
+	mqttPub.PublishJSON("power-flow", powerFlowData)
 }
 
-func collectInverterRealtimeData(client *fronius.SymoClient, w *sync.WaitGroup) {
+func pollInverterRealtimeData(client *fronius.SymoClient, state *exporterState, w *sync.WaitGroup) {
 	defer w.Done()
-	if client.Options.InverterRealtimeEnabled {
-		powerFlowData, err := client.GetInverterRealtimeData()
-		if err != nil {
-			log.WithError(err).Warn("Could not collect Symo inverter realtime metrics.")
-			scrapeErrorCount.Add(1)
-			return
-		}
-		parseInverterRealtimeData(powerFlowData)
+	if !client.Options.InverterRealtimeEnabled {
+		return
 	}
+
+	powerFlowData, err := client.GetInverterRealtimeData()
+	if err != nil {
+		log.WithError(err).Warn("Could not collect Symo inverter realtime metrics.")
+		scrapeErrorCount.Add(1)
+		state.MarkPollingError(time.Now())
+		return
+	}
+
+	updatedAt := time.Now()
+	parseInverterRealtimeData(powerFlowData)
+	state.SetInverterRealtime(powerFlowData, updatedAt)
+	mqttPub.PublishJSON("inverter-realtime", powerFlowData)
 }
 
-func collectMeterRealtimeData(client *fronius.SymoClient, w *sync.WaitGroup) {
+func pollMeterRealtimeData(client *fronius.SymoClient, state *exporterState, w *sync.WaitGroup) {
 	defer w.Done()
-	if client.Options.MeterRealtimeEnabled {
-		meterData, err := client.GetMeterRealtimeData()
-		if err != nil {
-			log.WithError(err).Warn("Could not collect Symo meter realtime metrics.")
-			scrapeErrorCount.Add(1)
-			return
-		}
-		parseMeterRealtimeData(meterData)
+	if !client.Options.MeterRealtimeEnabled {
+		return
 	}
+
+	meterData, err := client.GetMeterRealtimeData()
+	if err != nil {
+		log.WithError(err).Warn("Could not collect Symo meter realtime metrics.")
+		scrapeErrorCount.Add(1)
+		state.MarkPollingError(time.Now())
+		return
+	}
+
+	updatedAt := time.Now()
+	parseMeterRealtimeData(meterData)
+	state.SetMeterRealtime(meterData, updatedAt)
+	mqttPub.PublishJSON("meter-realtime", meterData)
 }
 
-func collectArchiveData(client *fronius.SymoClient, w *sync.WaitGroup) {
+func pollArchiveData(client *fronius.SymoClient, state *exporterState, w *sync.WaitGroup) {
 	defer w.Done()
-	if client.Options.ArchiveEnabled {
-		archiveData, err := client.GetArchiveData()
-		if err != nil {
-			log.WithError(err).Warn("Could not collect Symo archive metrics.")
-			scrapeErrorCount.Add(1)
-			return
-		}
-		parseArchiveMetrics(archiveData)
+	if !client.Options.ArchiveEnabled {
+		return
 	}
+
+	archiveData, err := client.GetArchiveData()
+	if err != nil {
+		log.WithError(err).Warn("Could not collect Symo archive metrics.")
+		scrapeErrorCount.Add(1)
+		state.MarkPollingError(time.Now())
+		return
+	}
+
+	updatedAt := time.Now()
+	parseArchiveMetrics(archiveData)
+	state.SetArchive(archiveData, updatedAt)
+	mqttPub.PublishJSON("archive", archiveData)
 }
 
 func parsePowerFlowMetrics(data *fronius.SymoData) {

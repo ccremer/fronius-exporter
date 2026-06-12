@@ -18,6 +18,7 @@ var (
 	date        = time.Now().String()
 	config      = cfg.ParseConfig(version, commit, date, flag.NewFlagSet("main", flag.ExitOnError), os.Args[1:])
 	promHandler = promhttp.Handler()
+	mqttPub     *mqttPublisher
 )
 
 func main() {
@@ -45,6 +46,24 @@ func main() {
 		log.Fatal("All scrape endpoints are disabled. You need enable at least one endpoint.")
 	}
 
+	mqttPub, err = newMQTTPublisher(config.MQTT, config.Symo, config.Poll)
+	if err != nil {
+		log.WithError(err).Fatal("Cannot initialize MQTT publisher.")
+	}
+	if mqttPub != nil {
+		log.WithFields(log.Fields{
+			"broker":     config.MQTT.Broker,
+			"base_topic": config.MQTT.BaseTopic,
+		}).Info("MQTT publishing enabled.")
+	}
+
+	state := newExporterState()
+	go startPollingLoop(symoClient, state, config.Poll.Interval)
+	log.WithFields(log.Fields{
+		"interval":      config.Poll.Interval,
+		"fresh_timeout": config.Poll.FreshTimeout,
+	}).Info("Background polling enabled.")
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
@@ -68,7 +87,10 @@ func main() {
 			"uri":    r.RequestURI,
 			"client": r.RemoteAddr,
 		}).Debug("Accessed Metrics endpoint")
-		collectMetricsFromTarget(symoClient)
+		if !state.IsFresh(symoClient.Options, config.Poll.FreshTimeout) {
+			http.Error(w, "cached metrics are stale", http.StatusServiceUnavailable)
+			return
+		}
 		promHandler.ServeHTTP(w, r)
 	})
 

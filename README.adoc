@@ -63,7 +63,24 @@ With https://ccremer.github.io/charts/fronius-exporter[fronius-exporter]
 fronius-exporter --symo.url http://symo.ip.or.hostname
 ----
 
-Upon each call to `/metrics`, the exporter will do a GET request on the given URL, and translate the JSON response to Prometheus metrics format.
+The exporter polls the configured Fronius endpoints in the background every 10 seconds by default and stores the latest results internally. The `/metrics` handler serves Prometheus metrics from that in-memory state.
+
+If the cached data is older than the configured freshness timeout, `/metrics` responds with HTTP 503 instead of serving stale metrics.
+
+If MQTT is configured, each successful background poll update is also queued for asynchronous MQTT publishing to the configured base topic with a suffix per data type:
+
+* `<base-topic>/power-flow`
+* `<base-topic>/archive`
+* `<base-topic>/inverter-realtime`
+* `<base-topic>/meter-realtime`
+
+Each MQTT payload contains the message type, a timestamp, and the full data returned by the corresponding Fronius API endpoint.
+
+MQTT connection setup does not block startup. Connection failures are logged but do not stop the exporter. Automatic reconnect and connect retry are enabled so broker reconnections work without restarting the exporter.
+
+MQTT can also be customized with a fixed client ID, publish queue size, reconnect interval, TLS client/server options, and an availability topic with last-will payloads. By default, the availability topic is `<base-topic>/availability`.
+
+Optionally, the exporter can also publish Home Assistant MQTT discovery sensor definitions as retained messages.
 
 == Configuration
 
@@ -84,6 +101,59 @@ fronius-exporter --symo.url http://...
 SYMO__URL=http://... fronius-exporter
 ----
 ====
+
+=== MQTT
+
+Example:
+
+[source,console]
+----
+fronius-exporter \
+  --symo.url http://symo.ip.or.hostname \
+  --mqtt.broker tcp://mqtt-broker:1883 \
+  --mqtt.username my-user \
+  --mqtt.password my-password \
+  --mqtt.base-topic home/solar/fronius \
+  --mqtt.client-id fronius-exporter \
+  --mqtt.queue-size 32 \
+  --mqtt.reconnect-interval 5 \
+  --mqtt.availability-topic home/solar/fronius/status
+----
+
+This publishes JSON messages to topics such as `home/solar/fronius/power-flow` and `home/solar/fronius/meter-realtime` whenever the background poll succeeds.
+
+==== Home Assistant MQTT discovery
+
+Example:
+
+[source,console]
+----
+fronius-exporter \
+  --symo.url http://symo.ip.or.hostname \
+  --mqtt.broker tcp://mqtt-broker:1883 \
+  --mqtt.base-topic home/solar/fronius \
+  --mqtt.discovery-enabled \
+  --mqtt.discovery-prefix homeassistant \
+  --mqtt.discovery-device-name "Garage Solar" \
+  --mqtt.discovery-device-id garage-solar
+----
+
+When enabled, the exporter publishes retained Home Assistant sensor discovery config topics under `<discovery-prefix>/sensor/<device-id>/.../config`.
+
+Discovery entities are only published for Fronius endpoint groups that are enabled in the exporter configuration. For example, archive sensors are omitted entirely when `symo.enable-archive` is disabled.
+
+If `mqtt.availability-topic` is configured, discovered sensors also include Home Assistant availability metadata and the exporter publishes `mqtt.availability-payload-up` on connect and `mqtt.availability-payload-down` as the broker last-will payload.
+
+All MPPT discovery entities are published. Only the first MPPT point is enabled by default in Home Assistant; additional MPPT points are marked `enabled_by_default: false`.
+
+The site power sensors for grid, load, battery, and PV are also published via discovery, but are marked `enabled_by_default: false`.
+
+Site autonomy and battery-related sensors such as inverter battery SoC are also marked `enabled_by_default: false`.
+
+You can use either:
+
+* automatic MQTT discovery in Home Assistant, or
+* the static example file at link:examples/homeassistant-mqtt.yaml[examples/homeassistant-mqtt.yaml]
 
 == As a client API
 

@@ -136,7 +136,6 @@ type (
 
 	// SymoClient is a wrapper for making API requests against a Fronius Symo device.
 	SymoClient struct {
-		request *http.Request
 		Options ClientOptions
 	}
 	// ClientOptions holds some parameters for the SymoClient.
@@ -154,24 +153,31 @@ type (
 // NewSymoClient constructs a SymoClient ready to use for collecting metrics.
 func NewSymoClient(options ClientOptions) (*SymoClient, error) {
 	return &SymoClient{
-		request: &http.Request{
-			Header: options.Headers,
-		},
 		Options: options,
+	}, nil
+}
+
+func (c *SymoClient) newRequest(rawURL string) (*http.Request, error) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return nil, err
+	}
+	return &http.Request{
+		Method: http.MethodGet,
+		URL:    u,
+		Header: c.Options.Headers.Clone(),
 	}, nil
 }
 
 // GetPowerFlowData returns the parsed data from the Symo device.
 func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
-	u, err := url.Parse(c.Options.URL + PowerDataPath)
+	req, err := c.newRequest(c.Options.URL + PowerDataPath)
 	if err != nil {
 		return nil, err
 	}
 
-	c.request.URL = u
-	client := http.DefaultClient
-	client.Timeout = c.Options.Timeout
-	response, err := client.Do(c.request)
+	client := &http.Client{Timeout: c.Options.Timeout}
+	response, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -186,15 +192,13 @@ func (c *SymoClient) GetPowerFlowData() (*SymoData, error) {
 
 // GetInverterRealtimeData returns the parsed data from the Symo device.
 func (c *SymoClient) GetInverterRealtimeData() (*SymoInverterRealtimeData, error) {
-	u, err := url.Parse(c.Options.URL + InverterRealtimeDataPath)
+	req, err := c.newRequest(c.Options.URL + InverterRealtimeDataPath)
 	if err != nil {
 		return nil, err
 	}
 
-	c.request.URL = u
-	client := http.DefaultClient
-	client.Timeout = c.Options.Timeout
-	response, err := client.Do(c.request)
+	client := &http.Client{Timeout: c.Options.Timeout}
+	response, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -209,15 +213,13 @@ func (c *SymoClient) GetInverterRealtimeData() (*SymoInverterRealtimeData, error
 
 // GetMeterRealtimeData returns the parsed data from the Symo device.
 func (c *SymoClient) GetMeterRealtimeData() (*SymoMeterRealtimeData, error) {
-	u, err := url.Parse(c.Options.URL + MeterRealtimeDataPath)
+	req, err := c.newRequest(c.Options.URL + MeterRealtimeDataPath)
 	if err != nil {
 		return nil, err
 	}
 
-	c.request.URL = u
-	client := http.DefaultClient
-	client.Timeout = c.Options.Timeout
-	response, err := client.Do(c.request)
+	client := &http.Client{Timeout: c.Options.Timeout}
+	response, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -233,24 +235,22 @@ func (c *SymoClient) GetMeterRealtimeData() (*SymoMeterRealtimeData, error) {
 
 // GetArchiveData returns the parsed data from the Symo device.
 func (c *SymoClient) GetArchiveData() (map[string]InverterArchive, error) {
-	u, err := url.Parse(c.Options.URL + ArchiveDataPath)
+	req, err := c.newRequest(c.Options.URL + ArchiveDataPath)
 	if err != nil {
 		return nil, err
 	}
 
-	c.request.URL = u
-	client := http.DefaultClient
-	client.Timeout = c.Options.Timeout
-	q := c.request.URL.Query()
+	client := &http.Client{Timeout: c.Options.Timeout}
+	q := req.URL.Query()
 	q.Del("StartDate")
 	q.Del("EndDate")
 
-	c.request.URL.RawQuery = fmt.Sprintf("%s&StartDate=%s&EndDate=%s",
+	req.URL.RawQuery = fmt.Sprintf("%s&StartDate=%s&EndDate=%s",
 		q.Encode(),
 		time.Now().Truncate(5*time.Minute).UTC().Local().Format(time.RFC3339),
 		time.Now().Add(5*time.Minute).Truncate(5*time.Minute).UTC().Local().Format(time.RFC3339))
 
-	response, err := client.Do(c.request)
+	response, err := client.Do(req)
 
 	if err != nil {
 		return nil, err
