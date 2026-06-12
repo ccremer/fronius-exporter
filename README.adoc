@@ -9,9 +9,8 @@ ifdef::env-github[]
 :ext-relative: {outfilesuffix}
 endif::[]
 
-= Looking for maintainer
-
-See https://github.com/ccremer/fronius-exporter/issues/134
+= Fork info
+This is a fork of https://github.com/ccremer/fronius-exporter, with added support for MQTT & HomeAssistant integration.
 
 = Fronius Exporter
 
